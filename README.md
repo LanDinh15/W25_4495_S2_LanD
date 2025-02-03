@@ -1,4 +1,4 @@
-# Dashboard_Development_By_Python
+# Dashboard Development By Python
 Developing a Python-Based Interactive Dashboard for Analyzing Movie Trends and Insights
 ## 📌 Description
 
