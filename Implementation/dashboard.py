@@ -30,7 +30,7 @@ st.image(netflix_image, use_column_width="always")
 df = pd.read_csv("netflix_titles.csv", decimal=',')
 
 # Filling null values
-df = df.dropna(subset=["date_added", "duration"])
+df = df.dropna(subset=["date_added", "duration"]) # Drop rows where date_added and duration is missing
 df['rating'] = df['rating'].fillna(df['rating'].mode()[0])
 df['duration'] = df['duration'].fillna(df['duration'].mode()[0])
 df['country'] = df['country'].fillna(df['country'].mode()[0])
@@ -43,10 +43,10 @@ df['date_added'] = pd.to_datetime(df['date_added'], format='%B %d, %Y', errors='
 df['date_added'].head()
 
 # Change duration column into float
-df["duration"] = df["duration"].str.extract('(\d+)').astype(float)
+df["duration"] = df["duration"].str.extract('(\d+)').astype(float) # ? How about 1 season
 
 # Print the table
-df
+#df
 
 # Create date picker
 col1, col2 = st.columns((2))
@@ -141,7 +141,7 @@ st.plotly_chart(fig2)
 
 # 3. Filled Map: Number of titles by countries
 st.subheader("Number of Titles by Country")
-country_counts = filtered_df.groupby('country')['title'].nunique().reset_index(name='count')
+country_counts = country_filtered_df.groupby('country')['title'].nunique().reset_index(name='count')
 
 # Create the filled map
 fig3 = px.choropleth(
@@ -154,14 +154,31 @@ fig3 = px.choropleth(
 )
 st.plotly_chart(fig3)
 
-# 4. Advanced Analytics: Simple recommendation system (example)
+# 4. Recommendation based on countries
 st.header("Content Recommendations")
-selected_title = st.selectbox("Select a title fyou like watching:", filtered_df['title'].unique())
-selected_genre = filtered_df[filtered_df['title'] == selected_title]['listed_in'].values[0]
-recommendations = filtered_df[filtered_df['listed_in'].str.contains(selected_genre)].sample(5)
-st.write("Recommended titles based on genre:")
-st.dataframe(recommendations[['title', 'type', 'rating', 'release_year']])
+selected_country = st.selectbox("Select a country you like watching:", country_filtered_df['country'].unique())
 
-# Add a button for fun
-if st.button("Click for a Fun Fact!"):
-    st.write("Netflix was founded in 1997 as a DVD rental service!")
+# Filter data for the selected country
+country_filtered = df[df['country'].str.contains(selected_country, na=False, case=False)]
+if not country_filtered.empty:
+    # Get the most common genre from the selected country
+    common_genre = country_filtered['listed_in'].mode()[0]
+    # Recommend movies based on the common genre
+    recommendations = df[df['listed_in'].str.contains(common_genre, na=False, case=False)].sample(5)
+    st.write(f"Recommended titles based on popular genre in {selected_country}:")
+    # Columns custom
+    # Rename columns
+    recommendations = recommendations.rename(columns={
+    'title': 'Title',
+    'type': 'Type',
+    'rating': 'Rating',
+    'release_year': 'Release Year'
+    })
+    # Display a well-formatted table
+    st.dataframe(
+        recommendations[['Title', 'Type', 'Rating', 'Release Year']], 
+        hide_index=True, 
+        use_container_width=True
+    )
+else:
+    st.write("No recommendations available for the selected country.")
