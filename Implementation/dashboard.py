@@ -154,6 +154,14 @@ fig3 = px.choropleth(
 )
 st.plotly_chart(fig3)
 
+# 4. Advanced Analytics: Simple recommendation system (example)
+st.header("Content Recommendations")
+selected_title = st.selectbox("Select a title fyou like watching:", filtered_df['title'].unique())
+selected_genre = filtered_df[filtered_df['title'] == selected_title]['listed_in'].values[0]
+recommendations = filtered_df[filtered_df['listed_in'].str.contains(selected_genre)].sample(5)
+st.write("Recommended titles based on genre:")
+st.dataframe(recommendations[['title', 'type', 'rating', 'release_year']])
+
 # Add a button for fun
 if st.button("Click for a Fun Fact!"):
     st.write("Netflix was founded in 1997 as a DVD rental service!")
