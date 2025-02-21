@@ -100,16 +100,16 @@ else:
 
 
 # 1. Line chart for time by Type
-st.subheader("Number of Titles Added Over Time by Type")
-titles_over_time = filtered_df.groupby([pd.Grouper(key='date_added', freq='M'), 'type'])['title'].nunique().reset_index(name='count')
-fig1 = px.line(titles_over_time, x="date_added", y="count", color="type",
-               color_discrete_map={"Movie": "#C00000", "TV Show": "#FFFFFF"}) 
-fig1.update_layout(
-    xaxis_title="Date added",
-    yaxis_title="Number of Titles",
-    template="seaborn"
-)
-st.plotly_chart(fig1)
+#st.subheader("Number of Titles Added Over Time by Type")
+#titles_over_time = filtered_df.groupby([pd.Grouper(key='date_added', freq='M'), 'type'])['title'].nunique().reset_index(name='count')
+#fig1 = px.line(titles_over_time, x="date_added", y="count", color="type",
+#               color_discrete_map={"Movie": "#C00000", "TV Show": "#FFFFFF"}) 
+#fig1.update_layout(
+#    xaxis_title="Date added",
+#    yaxis_title="Number of Titles",
+#    template="seaborn"
+#)
+#st.plotly_chart(fig1)
 
 # 2. Bar chart for Countries 
 # Filter the data based on country
@@ -156,12 +156,12 @@ st.header("Content Recommendations")
 selected_country = st.selectbox("Select a country you like watching:", country_filtered_df['country'].unique())
 
 # Filter data for the selected country
-country_filtered = df[df['country'].str.contains(selected_country, na=False, case=False)]
+country_filtered = filtered_df[filtered_df['country'].str.contains(selected_country, na=False, case=False)]
 if not country_filtered.empty:
     # Get the most common genre from the selected country
     common_genre = country_filtered['listed_in'].mode()[0]
     # Recommend movies based on the common genre
-    recommendations = df[df['listed_in'].str.contains(common_genre, na=False, case=False)].sample(5)
+    recommendations = filtered_df[filtered_df['listed_in'].str.contains(common_genre, na=False, case=False)].sample(5)
     st.write(f"Recommended titles based on popular genre in {selected_country}:")
     # Columns custom
     # Rename columns
