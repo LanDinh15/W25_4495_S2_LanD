@@ -12,7 +12,6 @@ warnings.filterwarnings('ignore')
 
 # Title and Netflix image
 color = ["#C00000", "#000000"]
-st.set_page_config(page_title="Movies Trends", layout="wide")
 st.title(":round_pushpin: Netflix Trends Dashboard")
 st.markdown(
     """
@@ -45,8 +44,6 @@ df['date_added'].head()
 # Change duration column into float
 df["duration"] = df["duration"].str.extract('(\d+)').astype(float) # ? How about 1 season
 
-# Print the table
-#df
 
 # Create date picker
 col1, col2 = st.columns((2))
