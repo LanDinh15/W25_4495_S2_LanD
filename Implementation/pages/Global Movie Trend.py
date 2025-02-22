@@ -98,20 +98,7 @@ elif year:
 else:
     filtered_df = df3[df3.type.isin(type) & df3.rating.isin(rating) & df3['release_year'].isin(year)]
 
-
-# 1. Line chart for time by Type
-#st.subheader("Number of Titles Added Over Time by Type")
-#titles_over_time = filtered_df.groupby([pd.Grouper(key='date_added', freq='M'), 'type'])['title'].nunique().reset_index(name='count')
-#fig1 = px.line(titles_over_time, x="date_added", y="count", color="type",
-#               color_discrete_map={"Movie": "#C00000", "TV Show": "#FFFFFF"}) 
-#fig1.update_layout(
-#    xaxis_title="Date added",
-#    yaxis_title="Number of Titles",
-#    template="seaborn"
-#)
-#st.plotly_chart(fig1)
-
-# 2. Bar chart for Countries 
+# 1. Bar chart for Countries 
 # Filter the data based on country
 if country:
     country_filtered_df = country_content[country_content['country'].isin(country)]
@@ -123,25 +110,25 @@ country_df = country_filtered_df.groupby(by=["country"], as_index=False)["durati
 # Select the top 10 countries with the highest total duration
 top_10_countries = country_df.nlargest(10, 'duration')
 st.subheader("Countries by Duration")
-fig2 = px.bar(top_10_countries, x="country", y="duration", text=['${:,.2f}'.format(x) for x in top_10_countries["duration"]],
+fig1 = px.bar(top_10_countries, x="country", y="duration", text=['${:,.2f}'.format(x) for x in top_10_countries["duration"]],
               color="duration",  
                 color_continuous_scale="Reds", 
              template="seaborn")
-fig2.update_layout(
+fig1.update_layout(
     width=1000,  
     height=400,  
     xaxis_title="Country",
     yaxis_title="Total Duration",
     xaxis_tickangle=-45  
 )
-st.plotly_chart(fig2)
+st.plotly_chart(fig1)
 
-# 3. Filled Map: Number of titles by countries
-st.subheader("Number of Titles by Country")
+# 2. Filled Map: Number of titles by countries
+st.subheader("Number of Movies Added by Country")
 country_counts = country_filtered_df.groupby('country')['title'].nunique().reset_index(name='count')
 
 # Create the filled map
-fig3 = px.choropleth(
+fig2 = px.choropleth(
     country_counts,
     locations="country",  
     locationmode="country names",  
@@ -149,9 +136,9 @@ fig3 = px.choropleth(
     hover_name="country",  
     color_continuous_scale="Reds"
 )
-st.plotly_chart(fig3)
+st.plotly_chart(fig2)
 
-# 4. Recommendation based on countries
+# 3. Recommendation based on countries
 st.header("Content Recommendations")
 selected_country = st.selectbox("Select a country you like watching:", country_filtered_df['country'].unique())
 
