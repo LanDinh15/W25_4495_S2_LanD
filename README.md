@@ -21,6 +21,22 @@ The **Movie Trends and Insights Dashboard** is a Python-based interactive web ap
   - Interactive filters and dynamic visualizations powered by **Plotly**.
   - Responsive design for seamless use on desktops, tablets, and mobile devices.
 
+---
+
+## Installation Instructions
+
+To run the Movie Trends and Insights Dashboard locally, follow these steps:
+
+### Prerequisites
+- **Python 3.8 or higher** installed on your system.
+- **Git** installed (optional, for cloning the repository).
+
+### Step 1: Clone the Repository
+1. Open a terminal or command prompt.
+2. Run the following command to clone the repository:
+   ```bash
+   git clone https://github.com/your-username/movie-trends-dashboard.git
+
 ## 📞 Contact
 - **Author**: Lan Dinh
 - **Email**: landinh.515@gmail.com
