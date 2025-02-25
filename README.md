@@ -30,10 +30,11 @@ To run the Movie Trends and Insights Dashboard locally, follow these steps:
 - **Git** installed (optional, for cloning the repository).
 
 ### Step 1: Clone the Repository
-1. Open a terminal or command prompt.
+1. Open a terminal in VS Code Studio.
 2. Run the following command to clone the repository:
    ```bash
    git clone https://github.com/your-username/movie-trends-dashboard.git
+  
 
 ## 📞 Contact
 - **Author**: Lan Dinh
