@@ -37,15 +37,15 @@ To run the Movie Trends and Insights Dashboard locally, follow these steps:
 3. Navigate to the project directory:
    ```bash
    cd Implementation
-   
-### Step 2: Install Required Packages
-    ```bash
-   pip install -r requirements.txt
-  
 ### Step 3: Run the Dashboard
   Start the Streamlit application by running the following command:
     ```bash
     streamlit run Welcome.py
+### Step 2: Install Required Packages
+   ```bash
+pip install -r requirements.txt
+
+
 
 ## 📞 Contact
 - **Author**: Lan Dinh
