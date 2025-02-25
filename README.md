@@ -33,8 +33,18 @@ To run the Movie Trends and Insights Dashboard locally, follow these steps:
 1. Open a terminal in VS Code Studio.
 2. Run the following command to clone the repository:
    ```bash
-   git clone https://github.com/your-username/movie-trends-dashboard.git
-  
+   git clone https://github.com/LanDinh15/W25_4495_S2_LanD.git
+3. Navigate to the project directory:
+   ```bash
+   cd Implementation
+   
+### Step 2: Install Required Packages
+  ```bash
+    pip install -r requirements.txt
+
+### Step 3: Run the Dashboard
+  Start the Streamlit application by running the following command:
+    
 
 ## 📞 Contact
 - **Author**: Lan Dinh
