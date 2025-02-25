@@ -21,7 +21,7 @@ The **Movie Trends and Insights Dashboard** is a Python-based interactive web ap
   - Interactive filters and dynamic visualizations powered by **Plotly**.
   - Responsive design for seamless use on desktops, tablets, and mobile devices.
 
-## Installation Instructions
+## 🔎 Installation Instructions
 
 To run the Movie Trends and Insights Dashboard locally, follow these steps:
 
