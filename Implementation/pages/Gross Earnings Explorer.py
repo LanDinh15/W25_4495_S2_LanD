@@ -5,10 +5,12 @@ import seaborn as sns # type: ignore
 import matplotlib.pyplot as plt # type: ignore
 import plotly.express as px # type: ignore
 from datetime import datetime
+from streamlit_plotly_events import plotly_events # type: ignore
 
 import warnings
 
 warnings.filterwarnings('ignore')
+st.set_page_config(layout="wide")
 
 # Title 
 st.title(":round_pushpin: IMDB Gross Earnings Explorer")
@@ -21,8 +23,26 @@ st.markdown(
     }
     </style>
     """, unsafe_allow_html=True)
-imdb_image = "https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/IMDB_Logo_2016.svg/1280px-IMDB_Logo_2016.svg.png"
-st.image(imdb_image, use_column_width="always")
+
+# Custom CSS to set a background image
+def set_background_image(image_url):
+    st.markdown(
+        f"""
+        <style>
+        .stApp {{
+            background-image: url("{image_url}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-blend-mode: overlay;
+        }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Set the background image 
+set_background_image("https://us.123rf.com/450wm/photojuli/photojuli2401/photojuli240100411/223012731-a-banner-for-the-film-industry-a-movie-date-a-movie-camera-3d-glasses-popcorn-in-striped-cups-on.jpg?ver=6")
 
 # Load data
 df = pd.read_csv('imdb_top_1000.csv')
@@ -80,7 +100,7 @@ year_range = st.sidebar.slider(
     format = "%d",
 )  
 # Selection for Genres
-genre = st.sidebar.multiselect("Pick genre: ", sorted(genre_content['genre'].unique(),reverse=False))
+genre = st.sidebar.multiselect("Pick your genre: ", sorted(genre_content['genre'].unique(),reverse=False))
 
 # Filter the dataset based on selected ranges
 filtered_df = df[
@@ -123,32 +143,97 @@ with tab1:
     # 1. Gross Earnings Over Time
     st.subheader("Total Gross Earnings (M) Over Time: Peak Performers")
     gross_trends = filtered_df.groupby('Released_Year')['Gross (M)'].sum().reset_index()
-    fig1 = px.line(gross_trends, 
-                x='Released_Year', 
-                y='Gross (M)',
-                labels={'Released_Year':'Year','Gross (M)': 'Total Gross Earnings (M)'},
-    )
-    highest_gross = filtered_df.loc[filtered_df.groupby('Released_Year')['Gross (M)'].idxmax()]
-    fig1.add_scatter(x=highest_gross['Released_Year'], 
-                    y=highest_gross['Gross (M)'],
-                    mode='markers', 
-                    hoverinfo='text', 
-                    text=[f"{title} ({year}) - ${gross:.1f}M" for title, year, gross in zip(highest_gross['Series_Title'], highest_gross['Released_Year'], highest_gross['Gross (M)'])],  # Include title, year, and gross                 
-                    marker=dict(opacity=0),  # Invisible points
-                    showlegend=False)
-    fig1.update_layout(
-                    xaxis_title='Released Year',
-                    yaxis_title='Total Gross Earnings (M)',
-                    template='plotly_white',
-                    hovermode='x unified',
-    )
-    st.plotly_chart(fig1, use_container_width=True)
+
+    # Check if filtered_df is empty
+    if filtered_df.empty:
+        st.warning("No data available after applying filters. Please adjust your filter settings.")
+    else:
+        # Create the line chart
+        fig1 = px.line(gross_trends, 
+                       x='Released_Year', 
+                       y='Gross (M)',
+                       labels={'Released_Year': 'Year', 'Gross (M)': 'Total Gross Earnings (M)'},
+                       color_discrete_sequence=['#FFA500']
+        )
+        highest_gross = filtered_df.loc[filtered_df.groupby('Released_Year')['Gross (M)'].idxmax()]
+
+        # Check if highest_gross has data
+        if not highest_gross.empty:
+            fig1.add_scatter(x=highest_gross['Released_Year'], 
+                             y=highest_gross['Gross (M)'],
+                             mode='markers', 
+                             hoverinfo='none', 
+                             marker=dict(opacity=0),  # Visible points
+                             customdata=highest_gross[['Series_Title', 'IMDB_Rating', 'Meta_score']].values,
+                             showlegend=False)
+            fig1.update_layout(
+                             xaxis_title='Released Year',
+                             yaxis_title='Total Gross Earnings (M)',
+                             template='plotly_white',
+                             hovermode='x unified',
+                             plot_bgcolor='rgba(0,0,0, 0)',
+                             paper_bgcolor='rgba(0, 0, 0, 0)',
+                             font=dict(color='#FFFFFF'),
+                             xaxis=dict(gridcolor='rgba(200, 200, 200, 0.3)'),
+                             yaxis=dict(gridcolor='rgba(200, 200, 200, 0.3)'),
+                             autosize=True,  
+                             margin=dict(l=50, r=50, t=50, b=50)  
+            )
+            # Capture click events
+            selected_points = plotly_events(fig1, click_event=True, hover_event=False, override_width="100%")
+            if selected_points:
+                try:
+                    click_x = selected_points[0]['x']
+                    nearest_year_idx = (highest_gross['Released_Year'] - click_x).abs().idxmin()
+                    # Convert index label to positional index
+                    if pd.isna(nearest_year_idx):
+                        st.session_state.clicked_movie = None
+                        st.warning("No valid movie data found for the clicked year.")
+                    else:
+                        # Convert the index label to a positional index for iloc
+                        positional_idx = highest_gross.index.get_loc(nearest_year_idx)
+                        movie_data = highest_gross.iloc[positional_idx]
+                        st.session_state.clicked_movie = {
+                            'title': movie_data['Series_Title'],
+                            'gross': movie_data['Gross (M)'],
+                            'rating': movie_data['IMDB_Rating'],
+                            'meta': movie_data['Meta_score'],
+                            'time': movie_data['Runtime (min)'],
+                            'genre':movie_data['Genre'],
+                            'cert': movie_data['Certificate'],
+                            'poster': movie_data['Poster_Link'],
+                            'overview': movie_data['Overview']
+                        }
+                        st.session_state.selected_year = int(highest_gross.loc[nearest_year_idx, 'Released_Year'])  
+                except (IndexError, KeyError, ValueError) as e:
+                    st.session_state.clicked_movie = None
+                    st.session_state.selected_year = None
+                    st.warning(f"Error accessing movie data: {str(e)}")
+            else:
+                st.session_state.clicked_movie = None
+                st.session_state.selected_year = None
+            # Show details below the chart
+            if st.session_state.clicked_movie:
+                st.subheader(f"Highest Gross Earning Movie Details in {st.session_state.selected_year}")
+                st.write(f"Movie: {st.session_state.clicked_movie['title']}")
+                st.write(f"Gross Earings: ${st.session_state.clicked_movie['gross'] * 1e6:,.0f}")
+                st.write(f"Runtime: {st.session_state.clicked_movie['time']} min")
+                st.write(f"Genre: {st.session_state.clicked_movie['genre']}")
+                st.write(f"Certificate: {st.session_state.clicked_movie['cert']}")
+                st.write(f"Rating: {st.session_state.clicked_movie['rating']:.1f}")
+                st.write(f"Meta Score: {st.session_state.clicked_movie['meta']:.1f}")
+                st.write(f"Overview: {st.session_state.clicked_movie['overview']}")
+                st.image(st.session_state.clicked_movie['poster'], caption="Poster", width=300) 
+            else:
+                st.write("Click a point on the chart to see details of the highest-grossing movie for that year.")
+        else:
+            st.warning("No highest-grossing movies available with the current filters.")
 
 with tab2:
     col1, col2 = st.columns([1,1])
     with col1:
         # 2. Top 10 Directors by Gross (M)
-        directors = filtered_df.groupby('Director').agg({'Gross (M)': 'sum', 'IMDB_Rating': 'mean', 'Series_Title': 'count'}).reset_index()
+        directors = filtered_df.groupby('Director').agg({'Gross (M)': 'sum', 'Series_Title': 'count'}).reset_index()
         directors_sorted = directors.sort_values(by='Gross (M)', ascending=False)
         top_10_directors = directors_sorted.head(10)
         # Create an interactive bar chart
@@ -158,20 +243,23 @@ with tab2:
             x='Director',
             y='Gross (M)',
             text=[f"${gross:.2f}M" for gross in top_10_directors['Gross (M)']],
-            hover_data={'IMDB_Rating': ':.1f', 'Series_Title': True},  
-            labels={'Gross(M)': 'Total Gross Earnings (M)', 'Director': 'Director','Series_Title':'Movie Count','IMDB_Rating':'Avg IMDb'},
+            hover_data={'Series_Title': True},  
+            labels={'Gross(M)': 'Total Gross Earnings (M)', 'Director': 'Director','Series_Title':'Movie Count'},
             color='Gross (M)', 
-            color_continuous_scale='Viridis'  
+            color_continuous_scale=['#FFF5EB', '#FFA500', '#FF4500'] 
         )
-        # Customize the layout
+        fig2.update_traces(
+                hovertemplate="<b>Director:</b> %{x}<br>" +
+                  "<b>Total Gross:</b> $%{y:.2f}M<br>" +
+                  "<b>Movie Count:</b> %{customdata[0]}<br>"
+        )
         fig2.update_layout(
             xaxis_title='Director',
-            yaxis_title='Total Gross Earnings (M)',
-            xaxis_tickangle=-45,  # Rotate director names for better readability
-            template='plotly_white',  # Use a clean template
+            yaxis_title='Gross Earnings (M)',
+            xaxis_tickangle=-45,  
+            template='plotly_white', 
             showlegend=False
         )
-        # Display the plot
         st.plotly_chart(fig2, use_container_width=True)
         # Show metrics
         c1, c2 = st.columns(2)
@@ -194,12 +282,10 @@ with tab2:
         actors_merged = actors_1
         for df_actor in [actors_2, actors_3, actors_4]:
             actors_merged = pd.merge(actors_merged, df_actor, on='Actor', how='outer')
-
         actors_merged['Gross (M)'] = actors_merged[['Gross_1', 'Gross_2', 'Gross_3', 'Gross_4']].sum(axis=1)
         actors_merged = actors_merged.drop(columns=['Gross_1', 'Gross_2', 'Gross_3', 'Gross_4'])
         actors_sorted = actors_merged.sort_values(by='Gross (M)', ascending=False)
         top_10_actors = actors_sorted.head(10)
-
         # Create an interactive bar chart
         st.subheader("Stars of the Box Office: Top 10 by Gross (M)")
         fig3 = px.bar(
@@ -207,21 +293,21 @@ with tab2:
             x='Actor',
             y='Gross (M)',
             text=[f"${gross:.2f}M" for gross in top_10_actors['Gross (M)']],
-            labels={'Gross (M)': 'Total Gross Earnings (M)', 'Actor': 'Actor'},
+            labels={'Gross (M)': 'Gross (M)', 'Actor': 'Actor'},
             color='Gross (M)',  
-            color_continuous_scale='Viridis'  
+            color_continuous_scale=['#FFF5EB', '#FFA500', '#FF4500'] 
         )
-
-        # Customize the layout
+        fig3.update_traces(
+                hovertemplate="<b>Actor:</b> %{x}<br>" +
+                  "<b>Total Gross:</b> $%{y:.2f}M<br>" 
+        )
         fig3.update_layout(
             xaxis_title='Actor',
-            yaxis_title='Total Gross Earnings (M)',
+            yaxis_title='Gross Earnings (M)',
             xaxis_tickangle=-45,  
             template='plotly_white',  
             showlegend=False  
         )
-
-        # Display the interactive plot in Streamlit
         st.plotly_chart(fig3, use_container_width=True)
 
         # Show metrics
@@ -248,7 +334,7 @@ with tab3:
                             if pd.api.types.is_numeric_dtype(df[col])]
     chosen_col = st.selectbox(label="Please select a column", options=cols)
     # Plot
-    fig4 = px.scatter(df,x=chosen_col,y="Gross (M)",
+    fig4 = px.scatter(filtered_df,x=chosen_col,y="Gross (M)",
                     color="Gross (M)",
                     log_x=True)
     st.plotly_chart(fig4,use_container_width=True)

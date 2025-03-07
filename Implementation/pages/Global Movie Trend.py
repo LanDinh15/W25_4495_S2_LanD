@@ -9,6 +9,7 @@ from datetime import datetime
 import warnings
 
 warnings.filterwarnings('ignore')
+st.set_page_config(layout="wide")
 
 # Title and Netflix image
 color = ["#C00000", "#000000"]

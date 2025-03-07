@@ -10,6 +10,7 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
+
 # Title 
 st.set_page_config(page_title="Movie Trends Dashboard", layout="wide")
 st.title(":clapper: Welcome to the Movie Trends Dashboard")
