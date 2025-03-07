@@ -40,7 +40,7 @@ def set_background_image(image_url):
         unsafe_allow_html=True
     )
 
-# Set the background image (replace with your image URL)
+# Set the background image 
 set_background_image("https://wallpapers.com/images/featured/movie-9pvmdtvz4cb0xl37.jpg")
 
 # Current Date
@@ -56,7 +56,8 @@ Use the sidebar to navigate through different dashboards and uncover key insight
 - Top trending movies
 - Box office analytics
 - Genre & rating breakdown
-- Global movie trends
+- Global Movie Trend
+- Gross Earnings Explorer
 
 Enjoy exploring and let the data tell the story! 🍿
 """)
