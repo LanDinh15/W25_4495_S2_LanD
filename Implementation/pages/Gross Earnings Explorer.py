@@ -13,7 +13,7 @@ warnings.filterwarnings('ignore')
 st.set_page_config(layout="wide")
 
 # Title 
-st.title(":round_pushpin: IMDB Gross Earnings Explorer")
+st.title(":star2: Gross Earnings Explorer")
 st.markdown(
     """
     <style>
