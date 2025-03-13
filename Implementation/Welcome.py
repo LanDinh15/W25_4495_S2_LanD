@@ -57,7 +57,7 @@ Use the sidebar to navigate through different dashboards and uncover key insight
 - Top trending movies
 - Box office analytics
 - Genre & rating breakdown
-- Global Movie Trend
+- Explore Global Trend
 - Gross Earnings Explorer
 
 Enjoy exploring and let the data tell the story! 🍿
