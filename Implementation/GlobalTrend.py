@@ -38,7 +38,9 @@ def show_global_trends():
             """,
             unsafe_allow_html=True
         )
-    set_background_image("https://thumbs.dreamstime.com/b/global-connecting-10498106.jpg")
+    #set_background_image("https://thumbs.dreamstime.com/b/global-connecting-10498106.jpg")
+    set_background_image("https://wallpapers.com/images/featured/movie-9pvmdtvz4cb0xl37.jpg")
+
 
     # Load the data
     df = pd.read_csv("netflix_titles.csv", decimal=',')

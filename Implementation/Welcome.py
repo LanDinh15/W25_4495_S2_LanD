@@ -17,6 +17,18 @@ warnings.filterwarnings('ignore')
 # Set page config as the FIRST Streamlit command
 st.set_page_config(page_title="Movie Trends Dashboard", layout='wide')
 
+# Custom CSS for consistent sidebar title color
+st.markdown(
+    """
+    <style>
+    .sidebar .sidebar-content .css-1d391kg {
+        color: #FF2400 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Define Welcome Function
 def welcome():
     st.title(":clapper: Welcome to the Movie Trends Dashboard")
@@ -63,11 +75,75 @@ def welcome():
     """)
     st.info("👉 Use the sidebar to get started!")
 
+# Define Profile Function
+def show_profile():
+    st.title(":dart: My Profile")
+    st.markdown(
+        """
+        <style>
+        h1 {
+            font-size: 40px !important;
+            color: #FF2400 !important;
+        }
+        .stForm {
+            color: #FF2400 !important;
+        }
+        </style>
+        """, unsafe_allow_html=True
+    )
+
+    def set_background_image(image_url):
+        st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background-image: url("{image_url}");
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                background-blend-mode: overlay;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+    set_background_image("https://wallpapers.com/images/featured/movie-9pvmdtvz4cb0xl37.jpg")
+
+    if "logged_in" not in st.session_state or not st.session_state.logged_in:
+        st.error("Please log in to view or edit your profile.")
+        return
+
+    creds = load_credentials()
+    user_info = creds[st.session_state.username]
+
+    st.subheader("Profile Details")
+    st.write(f"**Username:** {st.session_state.username}")
+    st.write(f"**Full Name:** {user_info['full_name']}")
+    st.write(f"**Email:** {user_info['email']}")
+
+    st.subheader("Update Profile")
+    with st.form(key="profile_form"):
+        new_full_name = st.text_input("Full Name", value=user_info["full_name"])
+        new_email = st.text_input("Email", value=user_info["email"])
+        new_password = st.text_input("New Password", type="password", value="")
+        confirm_password = st.text_input("Confirm New Password", type="password", value="")
+        submit_button = st.form_submit_button(label="Save Changes")
+        if submit_button:
+            if new_password and new_password != confirm_password:
+                st.error("New passwords do not match!")
+            elif update_user_profile(st.session_state.username, new_full_name, new_email, new_password):
+                st.success("Profile updated successfully!")
+                # Log out after password change to enforce re-login with new password
+                st.session_state.logged_in = False
+                st.session_state.username = None
+            else:
+                st.error("Failed to update profile.")
+
 # Authentication Functions
 CREDENTIALS_FILE = "users.json"
 if not os.path.exists(CREDENTIALS_FILE):
     with open(CREDENTIALS_FILE, "w") as f:
-        json.dump({"admin": "123"}, f)
+        json.dump({"admin": {"password": "123", "full_name": "Admin User", "email": "admin@example.com"}}, f)
 
 def load_credentials():
     with open(CREDENTIALS_FILE, "r") as f:
@@ -79,13 +155,30 @@ def save_credentials(creds):
 
 def check_login(username, password):
     creds = load_credentials()
-    return username in creds and creds[username] == password
+    return username in creds and creds[username]["password"] == password
 
-def register_user(username, password):
+def register_user(username, password, full_name, email):
     creds = load_credentials()
     if username in creds:
         return False
-    creds[username] = password
+    creds[username] = {
+        "password": password,
+        "full_name": full_name,
+        "email": email
+    }
+    save_credentials(creds)
+    return True
+
+def update_user_profile(username, full_name=None, email=None, password=None):
+    creds = load_credentials()
+    if username not in creds:
+        return False
+    if full_name:
+        creds[username]["full_name"] = full_name
+    if email:
+        creds[username]["email"] = email
+    if password:
+        creds[username]["password"] = password
     save_credentials(creds)
     return True
 
@@ -98,7 +191,7 @@ if "logged_in" not in st.session_state:
 st.sidebar.title("Movie Trends Dashboard")
 if st.session_state.logged_in:
     st.sidebar.markdown(f"**Logged in as:** {st.session_state.username}")
-    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Global Trends", "Gross Earnings"])
+    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Global Trends", "Gross Earnings", "Profile"])
     if st.sidebar.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = None
@@ -122,9 +215,11 @@ else:
             new_username = st.text_input("New Username")
             new_password = st.text_input("New Password", type="password")
             confirm_password = st.text_input("Confirm Password", type="password")
+            full_name = st.text_input("Full Name")
+            email = st.text_input("Email")
             if st.button("Register"):
                 if new_password == confirm_password:
-                    if register_user(new_username, new_password):
+                    if register_user(new_username, new_password, full_name, email):
                         st.success(f"Registration successful! Please log in as {new_username}.")
                     else:
                         st.error("Username already exists!")
@@ -132,7 +227,7 @@ else:
                     st.error("Passwords do not match!")
 
 # Main Logic
-if page == "Welcome" and not st.session_state.logged_in:
+if not st.session_state.logged_in and page == "Welcome":
     welcome()
 elif st.session_state.logged_in:
     if page == "Welcome":
@@ -141,6 +236,8 @@ elif st.session_state.logged_in:
         show_gross_earnings()
     elif page == "Global Trends":
         show_global_trends()
+    elif page == "Profile":
+        show_profile()
 else:
     st.title("Movie Trends Dashboard")
     st.info("Please log in or register to access the dashboards.")

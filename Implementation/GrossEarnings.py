@@ -40,9 +40,9 @@ def show_gross_earnings():
             """,
             unsafe_allow_html=True
         )
+    #set_background_image("https://us.123rf.com/450wm/photojuli/photojuli2401/photojuli240100411/223012731-a-banner-for-the-film-industry-a-movie-date-a-movie-camera-3d-glasses-popcorn-in-striped-cups-on.jpg?ver=6")
+    set_background_image("https://wallpapers.com/images/featured/movie-9pvmdtvz4cb0xl37.jpg")
 
-    # Set the background image 
-    set_background_image("https://us.123rf.com/450wm/photojuli/photojuli2401/photojuli240100411/223012731-a-banner-for-the-film-industry-a-movie-date-a-movie-camera-3d-glasses-popcorn-in-striped-cups-on.jpg?ver=6")
 
     # Load data
     df = pd.read_csv('imdb_top_1000.csv')

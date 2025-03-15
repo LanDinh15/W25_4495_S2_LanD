@@ -1,1 +1,20 @@
-{"admin": "123"}
+{
+    "admin": 
+        {
+            "password": "123", 
+            "full_name": "Admin User", 
+            "email": "admin@example.com"
+        }, 
+    "testuser": 
+        {
+            "password": "pass123", 
+            "full_name": "Test User", 
+            "email": "test@example.com"
+        }, 
+    "lan": 
+        {
+            "password": "56", 
+            "full_name": "Lan", 
+            "email": "lan1505@gmail.com"
+        }
+}
