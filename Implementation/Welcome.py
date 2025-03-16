@@ -139,6 +139,8 @@ def show_profile():
             else:
                 st.error("Failed to update profile.")
 
+    color = st.color_picker("Pick A Color", "#00f900")
+
 # Authentication Functions
 CREDENTIALS_FILE = "users.json"
 if not os.path.exists(CREDENTIALS_FILE):
@@ -191,7 +193,7 @@ if "logged_in" not in st.session_state:
 st.sidebar.title("Movie Trends Dashboard")
 if st.session_state.logged_in:
     st.sidebar.markdown(f"**Logged in as:** {st.session_state.username}")
-    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Global Trends", "Gross Earnings", "Profile"])
+    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Global Trends", "Gross Earnings", "Profile", "Survey"])
     if st.sidebar.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = None

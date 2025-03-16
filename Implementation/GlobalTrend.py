@@ -38,9 +38,7 @@ def show_global_trends():
             """,
             unsafe_allow_html=True
         )
-    #set_background_image("https://thumbs.dreamstime.com/b/global-connecting-10498106.jpg")
     set_background_image("https://wallpapers.com/images/featured/movie-9pvmdtvz4cb0xl37.jpg")
-
 
     # Load the data
     df = pd.read_csv("netflix_titles.csv", decimal=',')
@@ -72,9 +70,9 @@ def show_global_trends():
             return np.nan
     df['duration_minutes'] = df.apply(convert_to_minutes, axis=1)
     df['duration_hours'] = df['duration_minutes'] / 60
-    df = df.drop(columns=['duration_value', 'duration_unit', 'duration'])  # Drop temporary columns
+    df = df.drop(columns=['duration_value', 'duration_unit', 'duration'])  
 
-    # Define rating mapping
+    # Rating mapping
     rating_mapping = {
         'TV-Y': 'Kids',
         'TV-Y7': 'Kids',
@@ -91,7 +89,6 @@ def show_global_trends():
         'NR': 'Adult',
         'UR': 'Adult'
     }
-    # Map ratings to categories
     df['rating_category'] = df['rating'].map(rating_mapping)
 
 
@@ -194,10 +191,8 @@ def show_global_trends():
 
         # Display metrics
         st.subheader("Key Metrics")
-
         # First row
         col1, col2, col3 = st.columns(3)
-
         with col1:
             st.markdown(
                 f"""
@@ -208,7 +203,6 @@ def show_global_trends():
                 """,
                 unsafe_allow_html=True
             )
-
         with col2:
             st.markdown(
                 f"""
@@ -219,7 +213,6 @@ def show_global_trends():
                 """,
                 unsafe_allow_html=True
             )
-
         with col3:
             st.markdown(
                 f"""
@@ -233,7 +226,6 @@ def show_global_trends():
 
         # Second row
         col4, col5, col6 = st.columns(3)
-
         with col4:
             st.markdown(
                 f"""
@@ -244,7 +236,6 @@ def show_global_trends():
                 """,
                 unsafe_allow_html=True
             )
-
         with col5:
             st.markdown(
                 f"""
@@ -255,7 +246,6 @@ def show_global_trends():
                 """,
                 unsafe_allow_html=True
             )
-
         with col6:
             st.markdown(
                 f"""
