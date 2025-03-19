@@ -14,8 +14,12 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-# Set page config as the FIRST Streamlit command
 st.set_page_config(page_title="Movie Trends Dashboard", layout='wide')
+
+# Create avatars directory if it doesn't exist
+AVATARS_DIR = "avatars"
+if not os.path.exists(AVATARS_DIR):
+    os.makedirs(AVATARS_DIR)
 
 # Custom CSS for consistent sidebar title color
 st.markdown(
@@ -88,6 +92,10 @@ def show_profile():
         .stForm {
             color: #FF2400 !important;
         }
+        img {
+            border-radius: 80%;  
+            margin_right: 40px;
+        }
         </style>
         """, unsafe_allow_html=True
     )
@@ -120,6 +128,15 @@ def show_profile():
     st.write(f"**Username:** {st.session_state.username}")
     st.write(f"**Full Name:** {user_info['full_name']}")
     st.write(f"**Email:** {user_info['email']}")
+    # image = st.file_uploader("Please upload an image",type=["png","jpg"])
+    # if image is not None:
+    #     st.image(image)
+
+    # Display avatar if it exists
+    if user_info.get("avatar_path") and os.path.exists(user_info["avatar_path"]):
+        st.image(user_info["avatar_path"], caption="Your Avatar", width=150)
+    else:
+        st.write("**Avatar:** No avatar uploaded yet.")
 
     st.subheader("Update Profile")
     with st.form(key="profile_form"):
@@ -127,25 +144,37 @@ def show_profile():
         new_email = st.text_input("Email", value=user_info["email"])
         new_password = st.text_input("New Password", type="password", value="")
         confirm_password = st.text_input("Confirm New Password", type="password", value="")
+        avatar_file = st.file_uploader("Upload Avatar (PNG/JPG)", type=["png", "jpg", "jpeg"])
         submit_button = st.form_submit_button(label="Save Changes")
         if submit_button:
             if new_password and new_password != confirm_password:
                 st.error("New passwords do not match!")
-            elif update_user_profile(st.session_state.username, new_full_name, new_email, new_password):
-                st.success("Profile updated successfully!")
-                # Log out after password change to enforce re-login with new password
-                st.session_state.logged_in = False
-                st.session_state.username = None
             else:
-                st.error("Failed to update profile.")
-
-    color = st.color_picker("Pick A Color", "#00f900")
+                # Handle avatar upload
+                new_avatar_path = user_info.get("avatar_path", None)
+                if avatar_file is not None:
+                    # Save the uploaded file to the avatars directory
+                    new_avatar_path = os.path.join(AVATARS_DIR, f"{st.session_state.username}_{avatar_file.name}")
+                    with open(new_avatar_path, "wb") as f:
+                        f.write(avatar_file.getbuffer())
+                if update_user_profile(st.session_state.username, new_full_name, new_email, new_password, new_avatar_path):
+                    st.success("Profile updated successfully!")
+                    if new_password:  # Log out only if password changed
+                        st.session_state.logged_in = False
+                        st.session_state.username = None
+                else:
+                    st.error("Failed to update profile.")
 
 # Authentication Functions
 CREDENTIALS_FILE = "users.json"
 if not os.path.exists(CREDENTIALS_FILE):
     with open(CREDENTIALS_FILE, "w") as f:
-        json.dump({"admin": {"password": "123", "full_name": "Admin User", "email": "admin@example.com"}}, f)
+        json.dump({"admin": {
+            "password": "123", 
+            "full_name": "Admin User",
+            "email": "admin@example.com",
+            "avatar_path": None
+        }}, f)
 
 def load_credentials():
     with open(CREDENTIALS_FILE, "r") as f:
@@ -166,12 +195,13 @@ def register_user(username, password, full_name, email):
     creds[username] = {
         "password": password,
         "full_name": full_name,
-        "email": email
+        "email": email,
+        "avatar_path": None
     }
     save_credentials(creds)
     return True
 
-def update_user_profile(username, full_name=None, email=None, password=None):
+def update_user_profile(username, full_name=None, email=None, password=None, avatar_path=None):
     creds = load_credentials()
     if username not in creds:
         return False
@@ -181,6 +211,8 @@ def update_user_profile(username, full_name=None, email=None, password=None):
         creds[username]["email"] = email
     if password:
         creds[username]["password"] = password
+    if avatar_path:
+        creds[username]["avatar_path"] = avatar_path
     save_credentials(creds)
     return True
 
