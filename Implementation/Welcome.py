@@ -4,7 +4,7 @@ import numpy as np  # type: ignore
 import seaborn as sns  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
 import plotly.express as px  # type: ignore
-from datetime import datetime
+from datetime import datetime, date
 import json
 import os
 from GrossEarnings import show_gross_earnings
@@ -93,8 +93,9 @@ def show_profile():
             color: #FF2400 !important;
         }
         img {
-            border-radius: 80%;  
-            margin_right: 40px;
+            border-radius: 10px;
+            width: auto;
+            height: auto;
         }
         </style>
         """, unsafe_allow_html=True
@@ -125,22 +126,27 @@ def show_profile():
     user_info = creds[st.session_state.username]
 
     st.subheader("Profile Details")
-    st.write(f"**Username:** {st.session_state.username}")
-    st.write(f"**Full Name:** {user_info['full_name']}")
-    st.write(f"**Email:** {user_info['email']}")
-    # image = st.file_uploader("Please upload an image",type=["png","jpg"])
-    # if image is not None:
-    #     st.image(image)
-
-    # Display avatar if it exists
-    if user_info.get("avatar_path") and os.path.exists(user_info["avatar_path"]):
-        st.image(user_info["avatar_path"], caption="Your Avatar", width=150)
-    else:
-        st.write("**Avatar:** No avatar uploaded yet.")
-
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        # Display avatar if it exists
+        if user_info.get("avatar_path") and os.path.exists(user_info["avatar_path"]):
+            st.image(user_info["avatar_path"], caption="Your Avatar", width=150)
+        else:
+            st.write("**Avatar:** No avatar uploaded yet.")
+    with col2:
+        st.write(f"**Username:** {st.session_state.username}")
+        st.write(f"**Full Name:** {user_info['full_name']}")
+        # Safely access dob with a fallback
+        dob = user_info.get('dob', 'Not set')
+        st.write(f"**Date of Birth:** {dob}")
+        st.write(f"**Email:** {user_info['email']}")
+    
     st.subheader("Update Profile")
     with st.form(key="profile_form"):
         new_full_name = st.text_input("Full Name", value=user_info["full_name"])
+        # Convert dob string to date for st.date_input
+        default_dob = date.fromisoformat(user_info["dob"]) if user_info.get("dob") and user_info["dob"] != "None" else date.today()
+        new_dob = st.date_input("Date of Birth", value=default_dob, min_value=date(1900, 1, 1), max_value=date.today())
         new_email = st.text_input("Email", value=user_info["email"])
         new_password = st.text_input("New Password", type="password", value="")
         confirm_password = st.text_input("Confirm New Password", type="password", value="")
@@ -157,11 +163,14 @@ def show_profile():
                     new_avatar_path = os.path.join(AVATARS_DIR, f"{st.session_state.username}_{avatar_file.name}")
                     with open(new_avatar_path, "wb") as f:
                         f.write(avatar_file.getbuffer())
-                if update_user_profile(st.session_state.username, new_full_name, new_email, new_password, new_avatar_path):
+                # Convert new_dob to string for storage
+                new_dob_str = str(new_dob)
+                if update_user_profile(st.session_state.username, new_full_name, new_dob_str, new_email, new_password, new_avatar_path):
                     st.success("Profile updated successfully!")
                     if new_password:  # Log out only if password changed
                         st.session_state.logged_in = False
                         st.session_state.username = None
+                    st.rerun()  
                 else:
                     st.error("Failed to update profile.")
 
@@ -172,13 +181,21 @@ if not os.path.exists(CREDENTIALS_FILE):
         json.dump({"admin": {
             "password": "123", 
             "full_name": "Admin User",
+            "dob": None,
             "email": "admin@example.com",
             "avatar_path": None
         }}, f)
 
 def load_credentials():
+    # Load credentials and ensure all users have the dob field
     with open(CREDENTIALS_FILE, "r") as f:
-        return json.load(f)
+        creds = json.load(f)
+    # Add dob field to existing users if missing
+    for username in creds:
+        if "dob" not in creds[username]:
+            creds[username]["dob"] = None
+            save_credentials(creds)  # Save the updated creds
+    return creds
 
 def save_credentials(creds):
     with open(CREDENTIALS_FILE, "w") as f:
@@ -195,18 +212,21 @@ def register_user(username, password, full_name, email):
     creds[username] = {
         "password": password,
         "full_name": full_name,
+        "dob": None,
         "email": email,
         "avatar_path": None
     }
     save_credentials(creds)
     return True
 
-def update_user_profile(username, full_name=None, email=None, password=None, avatar_path=None):
+def update_user_profile(username, full_name=None, dob=None, email=None, password=None, avatar_path=None):
     creds = load_credentials()
     if username not in creds:
         return False
     if full_name:
         creds[username]["full_name"] = full_name
+    if dob is not None:  # Allow dob to be set to None or a string
+        creds[username]["dob"] = dob
     if email:
         creds[username]["email"] = email
     if password:
