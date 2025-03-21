@@ -9,6 +9,7 @@ import json
 import os
 from GrossEarnings import show_gross_earnings
 from GlobalTrend import show_global_trends 
+from MovieChecklist import show_movie_checklist
 
 import warnings
 
@@ -177,7 +178,6 @@ def show_profile():
                 if new_password and new_password != confirm_password:
                     st.error("New passwords do not match!")
                 else:
-                    # Handle avatar upload
                     new_avatar_path = user_info.get("avatar_path", None)
                     if avatar_file is not None:
                         # Save the uploaded file to the avatars directory
@@ -188,7 +188,7 @@ def show_profile():
                     new_dob_str = str(new_dob)
                     if update_user_profile(st.session_state.username, new_full_name, new_dob_str, new_email, new_password, new_avatar_path):
                         st.success("Profile updated successfully!")
-                        if new_password:  # Log out only if password changed
+                        if new_password: 
                             st.session_state.logged_in = False
                             st.session_state.username = None
                         st.rerun()  
@@ -211,10 +211,8 @@ if not os.path.exists(CREDENTIALS_FILE):
         }}, f)
 
 def load_credentials():
-    # Load credentials and ensure all users have the dob and checklist fields
     with open(CREDENTIALS_FILE, "r") as f:
         creds = json.load(f)
-    # Add missing fields to existing users
     for username in creds:
         if "dob" not in creds[username]:
             creds[username]["dob"] = None
@@ -268,7 +266,7 @@ if "logged_in" not in st.session_state:
 st.sidebar.title("Movie Trends Dashboard")
 if st.session_state.logged_in:
     st.sidebar.markdown(f"**Logged in as:** {st.session_state.username}")
-    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Global Trends", "Gross Earnings", "Profile", "Survey"])
+    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Global Trends", "Gross Earnings", "Profile", "Movie Checklist"])
     if st.sidebar.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = None
@@ -322,3 +320,5 @@ elif st.session_state.logged_in:
         show_global_trends()
     elif page == "Profile":
         show_profile()
+    elif page == "Movie Checklist":
+        show_movie_checklist()
