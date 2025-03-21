@@ -345,3 +345,5 @@ def show_gross_earnings():
                               color_continuous_scale=['#FFF5EB', '#FF9999', '#FF2400'],log_x=True, 
                             hover_data=['Series_Title', chosen_col], template='plotly_white')
             st.plotly_chart(fig4, use_container_width=True)
+
+    

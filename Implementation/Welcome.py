@@ -94,8 +94,6 @@ def show_profile():
         }
         img {
             border-radius: 10px;
-            width: auto;
-            height: auto;
         }
         </style>
         """, unsafe_allow_html=True
@@ -125,54 +123,112 @@ def show_profile():
     creds = load_credentials()
     user_info = creds[st.session_state.username]
 
+    # Initialize session state for checklist and update visibility
+    if "show_checklist" not in st.session_state:
+        st.session_state.show_checklist = False
+    if "show_update" not in st.session_state:
+        st.session_state.show_update = False
+
     st.subheader("Profile Details")
-    col1, col2 = st.columns([1, 3])
+    col1, col2, col3, col4 = st.columns([1, 2, 1, 1])  
     with col1:
         # Display avatar if it exists
         if user_info.get("avatar_path") and os.path.exists(user_info["avatar_path"]):
-            st.image(user_info["avatar_path"], caption="Your Avatar", width=150)
+            st.image(user_info["avatar_path"], caption="Your Avatar", width=200)  
         else:
             st.write("**Avatar:** No avatar uploaded yet.")
     with col2:
         st.write(f"**Username:** {st.session_state.username}")
         st.write(f"**Full Name:** {user_info['full_name']}")
-        # Safely access dob with a fallback
         dob = user_info.get('dob', 'Not set')
         st.write(f"**Date of Birth:** {dob}")
         st.write(f"**Email:** {user_info['email']}")
-    
-    st.subheader("Update Profile")
-    with st.form(key="profile_form"):
-        new_full_name = st.text_input("Full Name", value=user_info["full_name"])
-        # Convert dob string to date for st.date_input
-        default_dob = date.fromisoformat(user_info["dob"]) if user_info.get("dob") and user_info["dob"] != "None" else date.today()
-        new_dob = st.date_input("Date of Birth", value=default_dob, min_value=date(1900, 1, 1), max_value=date.today())
-        new_email = st.text_input("Email", value=user_info["email"])
-        new_password = st.text_input("New Password", type="password", value="")
-        confirm_password = st.text_input("Confirm New Password", type="password", value="")
-        avatar_file = st.file_uploader("Upload Avatar (PNG/JPG)", type=["png", "jpg", "jpeg"])
-        submit_button = st.form_submit_button(label="Save Changes")
-        if submit_button:
-            if new_password and new_password != confirm_password:
-                st.error("New passwords do not match!")
+    with col3:
+        update_button = st.button(label="Update My Profile", type="primary")
+        if update_button:
+            st.session_state.show_update = not st.session_state.show_update
+    with col4:
+        checklist_button = st.button(label="Checklist", type="primary")
+        if checklist_button:
+            st.session_state.show_checklist = not st.session_state.show_checklist
+
+    # Show checklist 
+    if st.session_state.show_checklist:
+        with st.container():
+            st.subheader("My Movie Checklist")
+            # Get the user's current checklist (default to empty list if not set)
+            user_checklist = user_info.get("checklist", [])
+            # Input to add a new movie
+            new_movie = st.text_input("Add a Movie to Your Checklist", placeholder="Enter movie title...")
+            col_add, col_reset, col_close = st.columns(3)
+            with col_add:
+                if st.button("Add Movie"):
+                    if new_movie:
+                        user_checklist.append(new_movie)
+                        update_user_profile(st.session_state.username, checklist=user_checklist)
+                        st.success(f"Added '{new_movie}' to your checklist!")
+                        st.rerun() 
+            with col_reset:
+                if st.button("Reset Checklist"):
+                    update_user_profile(st.session_state.username, checklist=[])
+                    st.success("Checklist reset successfully!")
+                    st.rerun()
+            with col_close:
+                if st.button("Close"):
+                    st.session_state.show_checklist = False
+                    st.rerun()
+            # Display the checklist
+            if user_checklist:
+                st.write("**Your Checklist:**")
+                for i, movie in enumerate(user_checklist, 1):
+                    st.write(f"{i}. {movie}")
             else:
-                # Handle avatar upload
-                new_avatar_path = user_info.get("avatar_path", None)
-                if avatar_file is not None:
-                    # Save the uploaded file to the avatars directory
-                    new_avatar_path = os.path.join(AVATARS_DIR, f"{st.session_state.username}_{avatar_file.name}")
-                    with open(new_avatar_path, "wb") as f:
-                        f.write(avatar_file.getbuffer())
-                # Convert new_dob to string for storage
-                new_dob_str = str(new_dob)
-                if update_user_profile(st.session_state.username, new_full_name, new_dob_str, new_email, new_password, new_avatar_path):
-                    st.success("Profile updated successfully!")
-                    if new_password:  # Log out only if password changed
-                        st.session_state.logged_in = False
-                        st.session_state.username = None
-                    st.rerun()  
+                st.write("Your checklist is empty. Add a movie above!")
+    
+    # Show update
+    if st.session_state.show_update:
+        st.subheader("Update Profile")
+        with st.form(key="profile_form"):
+            new_full_name = st.text_input("Full Name", value=user_info["full_name"])
+            # Convert dob string to date for st.date_input
+            default_dob = date.fromisoformat(user_info["dob"]) if user_info.get("dob") and user_info["dob"] != "None" else date.today()
+            new_dob = st.date_input("Date of Birth", value=default_dob, min_value=date(1900, 1, 1), max_value=date.today())
+            new_email = st.text_input("Email", value=user_info["email"])
+            new_password = st.text_input("New Password", type="password", value="")
+            confirm_password = st.text_input("Confirm New Password", type="password", value="")
+            avatar_file = st.file_uploader("Upload Avatar (PNG/JPG)", type=["png", "jpg", "jpeg"])
+            col_submit, col_reset, col_close = st.columns(3)
+            with col_submit:
+                submit_button = st.form_submit_button(label="Save Changes")
+            with col_reset:
+                reset_button = st.form_submit_button(label="Reset")
+            with col_close:
+                close_button = st.form_submit_button(label="Close")
+            
+            if submit_button:
+                if new_password and new_password != confirm_password:
+                    st.error("New passwords do not match!")
                 else:
-                    st.error("Failed to update profile.")
+                    # Handle avatar upload
+                    new_avatar_path = user_info.get("avatar_path", None)
+                    if avatar_file is not None:
+                        # Save the uploaded file to the avatars directory
+                        new_avatar_path = os.path.join(AVATARS_DIR, f"{st.session_state.username}_{avatar_file.name}")
+                        with open(new_avatar_path, "wb") as f:
+                            f.write(avatar_file.getbuffer())
+                    # Convert new_dob to string for storage
+                    new_dob_str = str(new_dob)
+                    if update_user_profile(st.session_state.username, new_full_name, new_dob_str, new_email, new_password, new_avatar_path):
+                        st.success("Profile updated successfully!")
+                        if new_password:  # Log out only if password changed
+                            st.session_state.logged_in = False
+                            st.session_state.username = None
+                        st.rerun()  
+                    else:
+                        st.error("Failed to update profile.")
+            elif close_button:
+                st.session_state.show_update = False
+                st.rerun()
 
 # Authentication Functions
 CREDENTIALS_FILE = "users.json"
@@ -183,17 +239,20 @@ if not os.path.exists(CREDENTIALS_FILE):
             "full_name": "Admin User",
             "dob": None,
             "email": "admin@example.com",
-            "avatar_path": None
+            "avatar_path": None,
+            "checklist": []  # Initialize checklist as an empty list
         }}, f)
 
 def load_credentials():
-    # Load credentials and ensure all users have the dob field
+    # Load credentials and ensure all users have the dob and checklist fields
     with open(CREDENTIALS_FILE, "r") as f:
         creds = json.load(f)
-    # Add dob field to existing users if missing
+    # Add missing fields to existing users
     for username in creds:
         if "dob" not in creds[username]:
             creds[username]["dob"] = None
+        if "checklist" not in creds[username]:
+            creds[username]["checklist"] = []
             save_credentials(creds)  # Save the updated creds
     return creds
 
@@ -214,18 +273,19 @@ def register_user(username, password, full_name, email):
         "full_name": full_name,
         "dob": None,
         "email": email,
-        "avatar_path": None
+        "avatar_path": None,
+        "checklist": []  # Initialize checklist for new users
     }
     save_credentials(creds)
     return True
 
-def update_user_profile(username, full_name=None, dob=None, email=None, password=None, avatar_path=None):
+def update_user_profile(username, full_name=None, dob=None, email=None, password=None, avatar_path=None, checklist=None):
     creds = load_credentials()
     if username not in creds:
         return False
     if full_name:
         creds[username]["full_name"] = full_name
-    if dob is not None:  # Allow dob to be set to None or a string
+    if dob is not None:
         creds[username]["dob"] = dob
     if email:
         creds[username]["email"] = email
@@ -233,6 +293,8 @@ def update_user_profile(username, full_name=None, dob=None, email=None, password
         creds[username]["password"] = password
     if avatar_path:
         creds[username]["avatar_path"] = avatar_path
+    if checklist is not None:
+        creds[username]["checklist"] = checklist
     save_credentials(creds)
     return True
 
@@ -251,7 +313,7 @@ if st.session_state.logged_in:
         st.session_state.username = None
         st.rerun()
 else:
-    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome"]) 
+    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Gross Earnings"]) 
     st.sidebar.markdown("---")
     with st.sidebar.expander("Authentication", expanded=True):
         auth_option = st.radio("Choose an option", ["Login", "Register"])
@@ -281,8 +343,15 @@ else:
                     st.error("Passwords do not match!")
 
 # Main Logic
-if not st.session_state.logged_in and page == "Welcome":
-    welcome()
+if not st.session_state.logged_in:
+    if page in ["Welcome", "Gross Earnings"]: 
+        if page == "Welcome":
+            welcome()
+        elif page == "Gross Earnings":
+            show_gross_earnings()
+    else:
+        st.title("Movie Trends Dashboard")
+        st.info("Please log in or register to access this dashboard.")
 elif st.session_state.logged_in:
     if page == "Welcome":
         welcome()
@@ -292,6 +361,3 @@ elif st.session_state.logged_in:
         show_global_trends()
     elif page == "Profile":
         show_profile()
-else:
-    st.title("Movie Trends Dashboard")
-    st.info("Please log in or register to access the dashboards.")
