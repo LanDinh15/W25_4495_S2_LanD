@@ -1,9 +1,9 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
-import plotly.express as px
+import streamlit as st #type:ignore
+import pandas as pd #type:ignore
+import numpy as np #type:ignore
+import seaborn as sns #type:ignore
+import matplotlib.pyplot as plt #type:ignore
+import plotly.express as px #type:ignore
 from datetime import datetime, date
 import os
 from GrossEarnings import show_gross_earnings
@@ -80,115 +80,119 @@ def welcome():
     """)
     st.info("👉 Use the sidebar to get started!")
 
-# Define Profile Function
+# Main logic
 def show_profile():
-    st.title(":dart: My Profile")
-    st.markdown(
-        """
-        <style>
-        h1 {
-            font-size: 40px !important;
-            color: #FF2400 !important;
-        }
-        .stForm {
-            color: #FF2400 !important;
-        }
-        img {
-            border-radius: 10px;
-        }
-        button[kind="secondaryFormSubmit"][data-testid="baseButton-secondaryFormSubmit"] {
-                    width: 100%;
-                    text-align: center;
-                }
-        </style>
-        """, unsafe_allow_html=True
-    )
-
-    def set_background_image(image_url):
+    tab1, tab2 = st.tabs(["My profile", "My Movie Checklist"])
+    with tab1:
+        st.title(":dart: My Profile")
         st.markdown(
-            f"""
+            """
             <style>
-            .stApp {{
-                background-image: url("{image_url}");
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;
-                background-blend-mode: overlay;
-            }}
+            h1 {
+                font-size: 40px !important;
+                color: #FF2400 !important;
+            }
+            .stForm {
+                color: #FF2400 !important;
+            }
+            img {
+                border-radius: 10px;
+            }
+            button[kind="secondaryFormSubmit"][data-testid="baseButton-secondaryFormSubmit"] {
+                        width: 100%;
+                        text-align: center;
+                    }
             </style>
-            """,
-            unsafe_allow_html=True
+            """, unsafe_allow_html=True
         )
-    set_background_image("https://wallpapers.com/images/featured/movie-9pvmdtvz4cb0xl37.jpg")
 
-    if "logged_in" not in st.session_state or not st.session_state.logged_in:
-        st.error("Please log in to view or edit your profile.")
-        return
+        def set_background_image(image_url):
+            st.markdown(
+                f"""
+                <style>
+                .stApp {{
+                    background-image: url("{image_url}");
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-blend-mode: overlay;
+                }}
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
+        set_background_image("https://dm0qx8t0i9gc9.cloudfront.net/thumbnails/video/HjBdmP0Asleresbeo/67498616eb475b39c79d09e7-ovq5u486qu_thumbnail-1080_05.png")
 
-    creds = load_credentials()
-    user_info = creds[st.session_state.username]
+        if "logged_in" not in st.session_state or not st.session_state.logged_in:
+            st.error("Please log in to view or edit your profile.")
+            return
 
-    if "show_checklist" not in st.session_state:
-        st.session_state.show_checklist = False
-    if "show_update" not in st.session_state:
-        st.session_state.show_update = False
+        creds = load_credentials()
+        user_info = creds[st.session_state.username]
 
-    st.subheader("Profile Details")
-    col1, col2, col3 = st.columns([1, 2, 1])  
-    with col1:
-        if user_info.get("avatar_path") and os.path.exists(user_info["avatar_path"]):
-            st.image(user_info["avatar_path"], caption="Your Avatar", width=200)  
-        else:
-            st.write("**Avatar:** No avatar uploaded yet.")
-    with col2:
-        st.write(f"**Username:** {st.session_state.username}")
-        st.write(f"**Full Name:** {user_info['full_name']}")
-        dob = user_info.get('dob', 'Not set')
-        st.write(f"**Date of Birth:** {dob}")
-        st.write(f"**Email:** {user_info['email']}")
-    with col3:
-        update_button = st.button(label="Update My Profile", type="primary")
-        if update_button:
-            st.session_state.show_update = not st.session_state.show_update
-    
-    if st.session_state.show_update:
-        st.subheader("Update Profile")
-        with st.form(key="profile_form"):
-            new_full_name = st.text_input("Full Name", value=user_info["full_name"])
-            default_dob = date.fromisoformat(user_info["dob"]) if user_info.get("dob") and user_info["dob"] != "None" else date.today()
-            new_dob = st.date_input("Date of Birth", value=default_dob, min_value=date(1900, 1, 1), max_value=date.today())
-            new_email = st.text_input("Email", value=user_info["email"])
-            new_password = st.text_input("New Password", type="password", value="")
-            confirm_password = st.text_input("Confirm New Password", type="password", value="")
-            avatar_file = st.file_uploader("Upload Avatar (PNG/JPG)", type=["png", "jpg", "jpeg"])
-            col_left, col_center, col_right = st.columns([3, 1, 1])
-            with col_left:
-                st.write("") 
-            with col_center:
-                submit_button = st.form_submit_button(label="Save Changes")
-            with col_right:
-                close_button = st.form_submit_button(label="Close")
-            if submit_button:
-                if new_password and new_password != confirm_password:
-                    st.error("New passwords do not match!")
-                else:
-                    new_avatar_path = user_info.get("avatar_path", None)
-                    if avatar_file is not None:
-                        new_avatar_path = os.path.join(AVATARS_DIR, f"{st.session_state.username}_{avatar_file.name}")
-                        with open(new_avatar_path, "wb") as f:
-                            f.write(avatar_file.getbuffer())
-                    new_dob_str = str(new_dob)
-                    if update_user_profile(st.session_state.username, new_full_name, new_dob_str, new_email, new_password, new_avatar_path):
-                        st.success("Profile updated successfully!")
-                        if new_password: 
-                            st.session_state.logged_in = False
-                            st.session_state.username = None
-                        st.rerun()  
+        if "show_checklist" not in st.session_state:
+            st.session_state.show_checklist = False
+        if "show_update" not in st.session_state:
+            st.session_state.show_update = False
+
+        st.subheader("Profile Details")
+        col1, col2, col3 = st.columns([1, 2, 1])  
+        with col1:
+            if user_info.get("avatar_path") and os.path.exists(user_info["avatar_path"]):
+                st.image(user_info["avatar_path"], caption="Your Avatar", width=200)  
+            else:
+                st.write("**Avatar:** No avatar uploaded yet.")
+        with col2:
+            st.write(f"**Username:** {st.session_state.username}")
+            st.write(f"**Full Name:** {user_info['full_name']}")
+            dob = user_info.get('dob', 'Not set')
+            st.write(f"**Date of Birth:** {dob}")
+            st.write(f"**Email:** {user_info['email']}")
+        with col3:
+            update_button = st.button(label="Update My Profile", type="primary")
+            if update_button:
+                st.session_state.show_update = not st.session_state.show_update
+        
+        if st.session_state.show_update:
+            st.subheader("Update Profile")
+            with st.form(key="profile_form"):
+                new_full_name = st.text_input("Full Name", value=user_info["full_name"])
+                default_dob = date.fromisoformat(user_info["dob"]) if user_info.get("dob") and user_info["dob"] != "None" else date.today()
+                new_dob = st.date_input("Date of Birth", value=default_dob, min_value=date(1900, 1, 1), max_value=date.today())
+                new_email = st.text_input("Email", value=user_info["email"])
+                new_password = st.text_input("New Password", type="password", value="")
+                confirm_password = st.text_input("Confirm New Password", type="password", value="")
+                avatar_file = st.file_uploader("Upload Avatar (PNG/JPG)", type=["png", "jpg", "jpeg"])
+                col_left, col_center, col_right = st.columns([3, 1, 1])
+                with col_left:
+                    st.write("") 
+                with col_center:
+                    submit_button = st.form_submit_button(label="Save Changes")
+                with col_right:
+                    close_button = st.form_submit_button(label="Close")
+                if submit_button:
+                    if new_password and new_password != confirm_password:
+                        st.error("New passwords do not match!")
                     else:
-                        st.error("Failed to update profile.")
-            elif close_button:
-                st.session_state.show_update = False
-                st.rerun()
+                        new_avatar_path = user_info.get("avatar_path", None)
+                        if avatar_file is not None:
+                            new_avatar_path = os.path.join(AVATARS_DIR, f"{st.session_state.username}_{avatar_file.name}")
+                            with open(new_avatar_path, "wb") as f:
+                                f.write(avatar_file.getbuffer())
+                        new_dob_str = str(new_dob)
+                        if update_user_profile(st.session_state.username, new_full_name, new_dob_str, new_email, new_password, new_avatar_path):
+                            st.success("Profile updated successfully!")
+                            if new_password: 
+                                st.session_state.logged_in = False
+                                st.session_state.username = None
+                            st.rerun()  
+                        else:
+                            st.error("Failed to update profile.")
+                elif close_button:
+                    st.session_state.show_update = False
+                    st.rerun()
+    with tab2:
+        show_movie_checklist()
 
 # Authentication State
 if "logged_in" not in st.session_state:
@@ -201,7 +205,7 @@ if "logged_in" not in st.session_state:
 st.sidebar.title("Movie Trends Dashboard")
 if st.session_state.logged_in:
     st.sidebar.markdown(f"**Logged in as:** {st.session_state.username}")
-    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Global Trends", "Gross Earnings", "Profile", "Movie Checklist"])
+    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Global Trends", "Gross Earnings", "Profile"])
     if st.sidebar.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = None
@@ -261,5 +265,3 @@ elif st.session_state.logged_in:
         show_global_trends()
     elif page == "Profile":
         show_profile()
-    elif page == "Movie Checklist":
-        show_movie_checklist()

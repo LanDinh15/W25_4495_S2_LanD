@@ -70,7 +70,7 @@ def show_movie_checklist():
     # Sync session state with file on each load
     st.session_state.movie_checklist = creds[current_user].get("movie_checklist", {})
 
-    # Display notifications as toast popups
+    # Display notifications
     notifications = creds[current_user].get("notifications", [])
     if notifications and not st.session_state.notifications_shown:
         for i, notif in enumerate(notifications):
@@ -125,26 +125,26 @@ def show_movie_checklist():
     # Main content
     with st.container():
         st.subheader("My Movie Checklist")
-        tab1, tab2 = st.tabs(["To Watch", "Watched"])
+        tab1, tab2 = st.tabs(["To Watch", "History"])
         unwatched_movies = {k: v for k, v in st.session_state.movie_checklist.items() if not v['watched']}
         watched_movies = {k: v for k, v in st.session_state.movie_checklist.items() if v['watched']}
 
         with tab1:
             if unwatched_movies:
                 for movie_id, movie_info in unwatched_movies.items():
-                    col1, col2, col3, col4, col5 = st.columns([1, 2, 1, 1, 1])
+                    col1, col2, col3, col4, col5 = st.columns([1, 4, 1, 1, 2])
                     with col1:
                         if movie_info.get('poster'):
                             st.image(f"{IMAGE_BASE_URL}{movie_info['poster']}", width=50)
                     with col2:
                         st.write(f"{movie_info['title']} ({movie_info.get('rating', 'N/A')}/10)")
                     with col3:
-                        if st.button("Watched", key=f"watch_{movie_id}"):
+                        if st.button("✔️", key=f"watch_{movie_id}", help="Add to history"):
                             st.session_state.movie_checklist[movie_id]['watched'] = True
                             update_user_profile(st.session_state.username, movie_checklist=st.session_state.movie_checklist)
                             st.rerun()
                     with col4:
-                        if st.button("Remove", key=f"remove_{movie_id}"):
+                        if st.button("✖️", key=f"remove_{movie_id}", help="Remove from list"):
                             del st.session_state.movie_checklist[movie_id]
                             update_user_profile(st.session_state.username, movie_checklist=st.session_state.movie_checklist)
                             st.rerun()
@@ -152,15 +152,17 @@ def show_movie_checklist():
                         share_toggle_key = f"show_share_unwatch_{movie_id}"
                         if share_toggle_key not in st.session_state:
                             st.session_state[share_toggle_key] = False
-                        if st.button("Share", key=f"share_unwatch_{movie_id}"):
+                        if st.button("👥", key=f"share_unwatch_{movie_id}", help="Share with friends"):
                             st.session_state[share_toggle_key] = not st.session_state[share_toggle_key]
                         if st.session_state[share_toggle_key]:
                             friends = [u for u in creds.keys() if u != current_user]
                             friend = st.selectbox(f"Share '{movie_info['title']}' with:", friends, key=f"friend_select_unwatch_{movie_id}")
-                            if st.button("Send", key=f"send_unwatch_{movie_id}"):
+                            custom_message = st.chat_input("Type a message", key=f"chat_unwatch_{movie_id}")
+                            if custom_message:
                                 friend_notifications = creds.get(friend, {}).get("notifications", [])
+                                message_to_send = f"{current_user} shared '{movie_info['title']}' with you: {custom_message}" if custom_message else f"{current_user} shared '{movie_info['title']}' with you!"
                                 friend_notifications.append({
-                                    "message": f"{current_user} shared '{movie_info['title']}' with you!",
+                                    "message": message_to_send,
                                     "read": False
                                 })
                                 update_user_profile(friend, notifications=friend_notifications)
@@ -173,14 +175,14 @@ def show_movie_checklist():
         with tab2:
             if watched_movies:
                 for movie_id, movie_info in watched_movies.items():
-                    col1, col2, col3, col4 = st.columns([1, 2, 1, 1])
+                    col1, col2, col3, col4 = st.columns([1, 4, 1, 2])
                     with col1:
                         if movie_info.get('poster'):
                             st.image(f"{IMAGE_BASE_URL}{movie_info['poster']}", width=50)
                     with col2:
                         st.write(f"{movie_info['title']} ({movie_info.get('rating', 'N/A')}/10)")
                     with col3:
-                        if st.button("Remove", key=f"remove_{movie_id}"):
+                        if st.button("✖️", key=f"remove_{movie_id}", help="Remove from list"):
                             del st.session_state.movie_checklist[movie_id]
                             update_user_profile(st.session_state.username, movie_checklist=st.session_state.movie_checklist)
                             st.rerun()
@@ -188,15 +190,17 @@ def show_movie_checklist():
                         share_toggle_key = f"show_share_watch_{movie_id}"
                         if share_toggle_key not in st.session_state:
                             st.session_state[share_toggle_key] = False
-                        if st.button("Share", key=f"share_watch_{movie_id}"):
+                        if st.button("👥", key=f"share_unwatch_{movie_id}", help="Share with friends"):
                             st.session_state[share_toggle_key] = not st.session_state[share_toggle_key]
                         if st.session_state[share_toggle_key]:
                             friends = [u for u in creds.keys() if u != current_user]
                             friend = st.selectbox(f"Share '{movie_info['title']}' with:", friends, key=f"friend_select_watch_{movie_id}")
-                            if st.button("Send", key=f"send_watch_{movie_id}"):
+                            custom_message = st.chat_input("Type a message", key=f"chat_unwatch_{movie_id}")
+                            if custom_message:
                                 friend_notifications = creds.get(friend, {}).get("notifications", [])
+                                message_to_send = f"{current_user} shared '{movie_info['title']}' with you: {custom_message}" if custom_message else f"{current_user} shared '{movie_info['title']}' with you!"
                                 friend_notifications.append({
-                                    "message": f"{current_user} shared '{movie_info['title']}' with you!",
+                                    "message": message_to_send,
                                     "read": False
                                 })
                                 update_user_profile(friend, notifications=friend_notifications)
@@ -236,7 +240,7 @@ def show_movie_checklist():
                     """,
                     unsafe_allow_html=True
                 )
-                if st.button("Add", key=f"popular_{movie_id}"):
+                if st.button("Add to Checklist", key=f"popular_{movie_id}"):
                     st.session_state.movie_checklist[movie_id] = {
                         'title': movie['title'],
                         'watched': False,
