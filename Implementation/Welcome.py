@@ -5,11 +5,11 @@ import seaborn as sns  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
 import plotly.express as px  # type: ignore
 from datetime import datetime, date
-import json
 import os
 from GrossEarnings import show_gross_earnings
 from GlobalTrend import show_global_trends 
 from MovieChecklist import show_movie_checklist
+from auth import load_credentials, check_login, register_user, update_user_profile
 
 import warnings
 
@@ -22,7 +22,7 @@ AVATARS_DIR = "avatars"
 if not os.path.exists(AVATARS_DIR):
     os.makedirs(AVATARS_DIR)
 
-# Custom CSS for consistent sidebar title color
+# CSS for consistent sidebar title color
 st.markdown(
     """
     <style>
@@ -128,7 +128,6 @@ def show_profile():
     creds = load_credentials()
     user_info = creds[st.session_state.username]
 
-    # Initialize session state for checklist and update visibility
     if "show_checklist" not in st.session_state:
         st.session_state.show_checklist = False
     if "show_update" not in st.session_state:
@@ -137,7 +136,6 @@ def show_profile():
     st.subheader("Profile Details")
     col1, col2, col3 = st.columns([1, 2, 1])  
     with col1:
-        # Display avatar if it exists
         if user_info.get("avatar_path") and os.path.exists(user_info["avatar_path"]):
             st.image(user_info["avatar_path"], caption="Your Avatar", width=200)  
         else:
@@ -153,19 +151,16 @@ def show_profile():
         if update_button:
             st.session_state.show_update = not st.session_state.show_update
     
-    # Show update
     if st.session_state.show_update:
         st.subheader("Update Profile")
         with st.form(key="profile_form"):
             new_full_name = st.text_input("Full Name", value=user_info["full_name"])
-            # Convert dob string to date for st.date_input
             default_dob = date.fromisoformat(user_info["dob"]) if user_info.get("dob") and user_info["dob"] != "None" else date.today()
             new_dob = st.date_input("Date of Birth", value=default_dob, min_value=date(1900, 1, 1), max_value=date.today())
             new_email = st.text_input("Email", value=user_info["email"])
             new_password = st.text_input("New Password", type="password", value="")
             confirm_password = st.text_input("Confirm New Password", type="password", value="")
             avatar_file = st.file_uploader("Upload Avatar (PNG/JPG)", type=["png", "jpg", "jpeg"])
-            # Buttons
             col_left, col_center, col_right = st.columns([3, 1, 1])
             with col_left:
                 st.write("") 
@@ -173,18 +168,15 @@ def show_profile():
                 submit_button = st.form_submit_button(label="Save Changes")
             with col_right:
                 close_button = st.form_submit_button(label="Close")
-            # Functions
             if submit_button:
                 if new_password and new_password != confirm_password:
                     st.error("New passwords do not match!")
                 else:
                     new_avatar_path = user_info.get("avatar_path", None)
                     if avatar_file is not None:
-                        # Save the uploaded file to the avatars directory
                         new_avatar_path = os.path.join(AVATARS_DIR, f"{st.session_state.username}_{avatar_file.name}")
                         with open(new_avatar_path, "wb") as f:
                             f.write(avatar_file.getbuffer())
-                    # Convert new_dob to string for storage
                     new_dob_str = str(new_dob)
                     if update_user_profile(st.session_state.username, new_full_name, new_dob_str, new_email, new_password, new_avatar_path):
                         st.success("Profile updated successfully!")
@@ -198,69 +190,11 @@ def show_profile():
                 st.session_state.show_update = False
                 st.rerun()
 
-# Authentication Functions
-CREDENTIALS_FILE = "users.json"
-if not os.path.exists(CREDENTIALS_FILE):
-    with open(CREDENTIALS_FILE, "w") as f:
-        json.dump({"admin": {
-            "password": "123", 
-            "full_name": "Admin User",
-            "dob": None,
-            "email": "admin@example.com",
-            "avatar_path": None,
-        }}, f)
-
-def load_credentials():
-    with open(CREDENTIALS_FILE, "r") as f:
-        creds = json.load(f)
-    for username in creds:
-        if "dob" not in creds[username]:
-            creds[username]["dob"] = None
-    return creds
-
-def save_credentials(creds):
-    with open(CREDENTIALS_FILE, "w") as f:
-        json.dump(creds, f)
-
-def check_login(username, password):
-    creds = load_credentials()
-    return username in creds and creds[username]["password"] == password
-
-def register_user(username, password, full_name, email):
-    creds = load_credentials()
-    if username in creds:
-        return False
-    creds[username] = {
-        "password": password,
-        "full_name": full_name,
-        "dob": None,
-        "email": email,
-        "avatar_path": None,
-        }
-    save_credentials(creds)
-    return True
-
-def update_user_profile(username, full_name=None, dob=None, email=None, password=None, avatar_path=None):
-    creds = load_credentials()
-    if username not in creds:
-        return False
-    if full_name:
-        creds[username]["full_name"] = full_name
-    if dob is not None:
-        creds[username]["dob"] = dob
-    if email:
-        creds[username]["email"] = email
-    if password:
-        creds[username]["password"] = password
-    if avatar_path:
-        creds[username]["avatar_path"] = avatar_path
-    save_credentials(creds)
-    return True
-
 # Authentication State
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.username = None
+    st.session_state.movie_checklist = {}
 
 # Sidebar
 st.sidebar.title("Movie Trends Dashboard")
@@ -270,6 +204,7 @@ if st.session_state.logged_in:
     if st.sidebar.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = None
+        st.session_state.movie_checklist = {}
         st.rerun()
 else:
     page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Gross Earnings"]) 
@@ -283,6 +218,8 @@ else:
                 if check_login(username, password):
                     st.session_state.logged_in = True
                     st.session_state.username = username
+                    creds = load_credentials()
+                    st.session_state.movie_checklist = creds[username]["movie_checklist"]
                     st.success(f"Welcome, {username}!")
                 else:
                     st.error("Invalid credentials")

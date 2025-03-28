@@ -1,5 +1,6 @@
 import streamlit as st  # type: ignore
 import requests  # type: ignore
+from auth import load_credentials, update_user_profile
 
 def show_movie_checklist():
     # TMDb API configuration
@@ -14,11 +15,15 @@ def show_movie_checklist():
         width: 100%;
         margin-top: 5px;
     }
+    h1 {
+        font-size: 40px !important;
+        color: #FF2400 !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-    def get_popular_movies():
-        url = f"{BASE_URL}/movie/popular?api_key={API_KEY}&language=en-US&page=1"
+    def get_popular_movies(page=1):
+        url = f"{BASE_URL}/movie/popular?api_key={API_KEY}&language=en-US&page={page}"
         response = requests.get(url)
         return response.json()['results'] if response.status_code == 200 else []
 
@@ -39,31 +44,37 @@ def show_movie_checklist():
             title = movie['title'].lower()
             if query in title and title != query:
                 suggestions.add(movie['title'])
-            if len(suggestions) >= 3:  # Limit to 3 suggestions
+            if len(suggestions) >= 3:
                 break
         return list(suggestions)
 
     # Main logic
     st.title("🎬 Movie Checklist")
 
-    # Initialize session state for checklist
+    if "logged_in" not in st.session_state or not st.session_state.logged_in:
+        st.error("Please log in to access your movie checklist.")
+        return
+
+    # Initialize session state
     if 'movie_checklist' not in st.session_state:
         st.session_state.movie_checklist = {}
+    if 'popular_movies' not in st.session_state:
+        st.session_state.popular_movies = get_popular_movies(page=1) 
+    if 'popular_page' not in st.session_state:
+        st.session_state.popular_page = 1 
 
     # Searching movies
     st.subheader("Search Movies")
     search_query = st.text_input("Enter movie title")
     
-    # Initialize suggestions with a default value
     suggestions = []
-    search_results = []  # Also initialize search_results to avoid similar issues later
+    search_results = []  
     
     if search_query:
         search_results = search_movies(search_query)
         popular_movies = get_popular_movies()
         suggestions = get_keyword_suggestions(search_query, popular_movies + search_results)
 
-    # Display keyword suggestions
     if suggestions:
         st.write("Did you mean:")
         cols = st.columns(len(suggestions))
@@ -95,6 +106,7 @@ def show_movie_checklist():
                         'poster': movie.get('poster_path'),
                         'rating': movie.get('vote_average')
                     }
+                    update_user_profile(st.session_state.username, movie_checklist=st.session_state.movie_checklist)
 
     # Main content
     with st.container():
@@ -108,7 +120,7 @@ def show_movie_checklist():
         with tab1:
             if unwatched_movies:
                 for movie_id, movie_info in unwatched_movies.items():
-                    col1, col2, col3 = st.columns([1, 3, 1])
+                    col1, col2, col3, col4= st.columns([1, 3, 1,1])
                     with col1:
                         if movie_info.get('poster'):
                             st.image(f"{IMAGE_BASE_URL}{movie_info['poster']}", width=50)
@@ -117,6 +129,12 @@ def show_movie_checklist():
                     with col3:
                         if st.button("Watched", key=f"watch_{movie_id}"):
                             st.session_state.movie_checklist[movie_id]['watched'] = True
+                            update_user_profile(st.session_state.username, movie_checklist=st.session_state.movie_checklist)
+                            st.rerun()
+                    with col4: 
+                        if st.button("Remove", key=f"remove_{movie_id}"):
+                            del st.session_state.movie_checklist[movie_id]
+                            update_user_profile(st.session_state.username, movie_checklist=st.session_state.movie_checklist)
                             st.rerun()
             else:
                 st.write("No movies in your watchlist yet!")
@@ -133,32 +151,56 @@ def show_movie_checklist():
                     with col3:
                         if st.button("Remove", key=f"remove_{movie_id}"):
                             del st.session_state.movie_checklist[movie_id]
+                            update_user_profile(st.session_state.username, movie_checklist=st.session_state.movie_checklist)
                             st.rerun()
             else:
                 st.write("No movies watched yet!")
 
         # Popular movies section
         st.subheader("Popular Movies")
-        popular_movies = get_popular_movies()
+        
+        available_popular_movies = [movie for movie in st.session_state.popular_movies 
+                                  if str(movie['id']) not in st.session_state.movie_checklist]
+        
+        # Fetch more movies
+        DISPLAY_COUNT = 12  # Number of movies to always display
+        while len(available_popular_movies) < DISPLAY_COUNT:
+            st.session_state.popular_page += 1
+            new_movies = get_popular_movies(page=st.session_state.popular_page)
+            if not new_movies: 
+                break
+            st.session_state.popular_movies.extend(new_movies)
+            available_popular_movies = [movie for movie in st.session_state.popular_movies 
+                                      if str(movie['id']) not in st.session_state.movie_checklist]
+
+        # Display the top DISPLAY_COUNT movies
         cols = st.columns(3)
-        for idx, movie in enumerate(popular_movies[:6]):
+        for idx, movie in enumerate(available_popular_movies[:DISPLAY_COUNT]):
             movie_id = movie['id']
-            if movie_id not in st.session_state.movie_checklist:
-                with cols[idx % 3]:
-                    st.markdown(
-                        f"""
-                        <div style='border: 1px solid #e0e0e0; border-radius: 5px; padding: 10px; margin: 5px; height: 300px; overflow: auto;'>
-                            <img src='{IMAGE_BASE_URL}{movie.get('poster_path', '')}' width='100%' style='border-radius: 5px;'>
-                            <h4 style='margin: 5px 0;'>{movie['title']}</h4>
-                            <p style='font-size: 12px; margin: 2px 0;'>Rating: {movie.get('vote_average', 'N/A')}/10</p>
-                        </div>
-                        """,
-                        unsafe_allow_html=True
-                    )
-                    if st.button("Add", key=f"popular_{movie_id}"):
-                        st.session_state.movie_checklist[movie_id] = {
-                            'title': movie['title'],
-                            'watched': False,
-                            'poster': movie.get('poster_path'),
-                            'rating': movie.get('vote_average')
-                        }
+            with cols[idx % 3]:
+                st.markdown(
+                    f"""
+                    <div 
+                    style='border: 1px solid #e0e0e0; 
+                    border-radius: 5px; 
+                    padding: 10px; 
+                    margin: 5px; 
+                    height: auto; 
+                    overflow: auto;'>
+                        <img src='{IMAGE_BASE_URL}{movie.get('poster_path', '')}' width='100%' style='border-radius: 5px;'>
+                        <h4 style='margin: 5px 0;'>{movie['title']}</h4>
+                        <p style='font-size: 14px; margin: 2px 0;'>Rating: {movie.get('vote_average', 'N/A')}/10</p>
+                        <p style='font-size: 14px; margin: 2px 0; margin-top: 4px;'>Overview: {movie.get('overview', 'N/A')}</p>
+                    </div>
+                    """,
+                    unsafe_allow_html=True
+                )
+                if st.button("Add", key=f"popular_{movie_id}"):
+                    st.session_state.movie_checklist[str(movie_id)] = {
+                        'title': movie['title'],
+                        'watched': False,
+                        'poster': movie.get('poster_path'),
+                        'rating': movie.get('vote_average')
+                    }
+                    update_user_profile(st.session_state.username, movie_checklist=st.session_state.movie_checklist)
+                    st.rerun() 
