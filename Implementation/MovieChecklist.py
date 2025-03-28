@@ -212,8 +212,8 @@ def show_movie_checklist():
         # Popular movies section
         st.subheader("Popular Movies")
         available_popular_movies = [movie for movie in st.session_state.popular_movies 
-                                  if str(movie['id']) not in st.session_state.movie_checklist]
-        
+                                if str(movie['id']) not in st.session_state.movie_checklist]
+
         DISPLAY_COUNT = 33
         while len(available_popular_movies) < DISPLAY_COUNT:
             st.session_state.popular_page += 1
@@ -222,10 +222,19 @@ def show_movie_checklist():
                 break
             st.session_state.popular_movies.extend(new_movies)
             available_popular_movies = [movie for movie in st.session_state.popular_movies 
-                                      if str(movie['id']) not in st.session_state.movie_checklist]
+                                    if str(movie['id']) not in st.session_state.movie_checklist]
+
+        # Deduplicate popular movies by movie_id to avoid repeats
+        seen_ids = set()
+        unique_popular_movies = []
+        for movie in available_popular_movies:
+            movie_id = str(movie['id'])
+            if movie_id not in seen_ids:
+                seen_ids.add(movie_id)
+                unique_popular_movies.append(movie)
 
         cols = st.columns(3)
-        for idx, movie in enumerate(available_popular_movies[:DISPLAY_COUNT]):
+        for idx, movie in enumerate(unique_popular_movies[:DISPLAY_COUNT]):
             movie_id = str(movie['id'])
             with cols[idx % 3]:
                 st.markdown(
@@ -239,7 +248,7 @@ def show_movie_checklist():
                     """,
                     unsafe_allow_html=True
                 )
-                if st.button("Add to Checklist", key=f"popular_{movie_id}"):
+                if st.button("Add to Checklist", key=f"popular_{movie_id}_{idx}"):
                     st.session_state.movie_checklist[movie_id] = {
                         'title': movie['title'],
                         'watched': False,
