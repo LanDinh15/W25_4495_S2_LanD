@@ -152,7 +152,7 @@ def show_movie_checklist():
                         share_toggle_key = f"show_share_unwatch_{movie_id}"
                         if share_toggle_key not in st.session_state:
                             st.session_state[share_toggle_key] = False
-                        if st.button("👥", key=f"share_unwatch_{movie_id}", help="Share with friends"):
+                        if st.button("👥", key=f"share_unwatch_{movie_id}", help="Share with your friends"):
                             st.session_state[share_toggle_key] = not st.session_state[share_toggle_key]
                         if st.session_state[share_toggle_key]:
                             friends = [u for u in creds.keys() if u != current_user]
