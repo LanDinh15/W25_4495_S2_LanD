@@ -8,7 +8,6 @@ def show_movie_checklist():
     BASE_URL = "https://api.themoviedb.org/3"
     IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w200"
 
-    # Styling
     st.markdown("""
     <style>
     .stButton>button {
@@ -78,8 +77,8 @@ def show_movie_checklist():
                 st.toast(f"{notif['message']}", icon="📬")
                 notifications[i]["read"] = True
                 update_user_profile(current_user, notifications=notifications)
-        st.session_state.notifications_shown = True  # Prevent repeated popups on rerun
-
+        st.session_state.notifications_shown = True 
+        
     # Searching movies
     st.subheader("Search Movies")
     search_query = st.text_input("Enter movie title")
@@ -215,7 +214,7 @@ def show_movie_checklist():
         available_popular_movies = [movie for movie in st.session_state.popular_movies 
                                   if str(movie['id']) not in st.session_state.movie_checklist]
         
-        DISPLAY_COUNT = 12
+        DISPLAY_COUNT = 33
         while len(available_popular_movies) < DISPLAY_COUNT:
             st.session_state.popular_page += 1
             new_movies = get_popular_movies(page=st.session_state.popular_page)
