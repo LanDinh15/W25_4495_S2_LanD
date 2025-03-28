@@ -49,7 +49,7 @@ def show_movie_checklist():
         return list(suggestions)
 
     # Main logic
-    st.title("🎬 Movie Checklist")
+    st.title("🎬 My Movielist")
 
     if "logged_in" not in st.session_state or not st.session_state.logged_in:
         st.error("Please log in to access your movie checklist.")
@@ -124,7 +124,7 @@ def show_movie_checklist():
 
     # Main content
     with st.container():
-        st.subheader("My Movie Checklist")
+        st.subheader("My Movielist")
         tab1, tab2 = st.tabs(["To Watch", "History"])
         unwatched_movies = {k: v for k, v in st.session_state.movie_checklist.items() if not v['watched']}
         watched_movies = {k: v for k, v in st.session_state.movie_checklist.items() if v['watched']}
