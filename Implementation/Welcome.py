@@ -1,9 +1,9 @@
-import streamlit as st  # type: ignore
-import pandas as pd  # type: ignore
-import numpy as np  # type: ignore
-import seaborn as sns  # type: ignore
-import matplotlib.pyplot as plt  # type: ignore
-import plotly.express as px  # type: ignore
+import streamlit as st
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import plotly.express as px
 from datetime import datetime, date
 import os
 from GrossEarnings import show_gross_earnings
@@ -195,6 +195,7 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.username = None
     st.session_state.movie_checklist = {}
+    st.session_state.notifications_shown = False  # Initialize here
 
 # Sidebar
 st.sidebar.title("Movie Trends Dashboard")
@@ -205,6 +206,7 @@ if st.session_state.logged_in:
         st.session_state.logged_in = False
         st.session_state.username = None
         st.session_state.movie_checklist = {}
+        st.session_state.notifications_shown = False  # Reset on logout
         st.rerun()
 else:
     page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Gross Earnings"]) 
@@ -220,7 +222,9 @@ else:
                     st.session_state.username = username
                     creds = load_credentials()
                     st.session_state.movie_checklist = creds[username]["movie_checklist"]
+                    st.session_state.notifications_shown = False  # Reset on login
                     st.success(f"Welcome, {username}!")
+                    st.rerun()
                 else:
                     st.error("Invalid credentials")
         elif auth_option == "Register":
