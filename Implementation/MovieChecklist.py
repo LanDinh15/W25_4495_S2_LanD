@@ -9,6 +9,7 @@ def show_movie_checklist():
     BASE_URL = "https://api.themoviedb.org/3"
     IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w200"
 
+    # Custom CSS for styling notifications and buttons
     st.markdown("""
     <style>
     .stButton>button {
@@ -18,6 +19,18 @@ def show_movie_checklist():
     h1 {
         font-size: 40px !important;
         color: #FF2400 !important;
+    }
+    .notification-unread {
+        font-weight: bold;
+        color: #FF2400;
+    }
+    .notification-read {
+        color: #888888;
+    }
+    .notification-container {
+        max-height: 300px;
+        overflow-y: auto;
+        padding: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -49,15 +62,34 @@ def show_movie_checklist():
         return list(suggestions)
 
     # Main logic
-    st.title("🎬 My Movielist")
+    col1, col2 = st.columns([9, 1])  
+    with col1:
+        st.title("🎬 My Movielist")
+    with col2:
+        creds = load_credentials()
+        current_user = st.session_state.username
+        notifications = creds[current_user].get("notifications", [])
+        unread_count = sum(1 for notif in notifications if not notif["read"])
+        with st.popover(f"🔔 ({unread_count})", help="View your notifications"):
+            if notifications:
+                st.markdown("<div class='notification-container'>", unsafe_allow_html=True)
+                for i, notif in enumerate(notifications):
+                    style_class = "notification-unread" if not notif["read"] else "notification-read"
+                    st.markdown(f"<p class='{style_class}'>{notif['message']}</p>", unsafe_allow_html=True)
+                if st.button("Mark All as Read", key="mark_all_read"):
+                    for i in range(len(notifications)):
+                        notifications[i]["read"] = True
+                    update_user_profile(current_user, notifications=notifications)
+                    st.rerun()
+                st.markdown("</div>", unsafe_allow_html=True)
+            else:
+                st.write("No notifications yet!")
 
     if "logged_in" not in st.session_state or not st.session_state.logged_in:
         st.error("Please log in to access your movie checklist.")
         return
-    
+
     # Load user data
-    creds = load_credentials()
-    current_user = st.session_state.username
     if 'movie_checklist' not in st.session_state:
         st.session_state.movie_checklist = creds[current_user].get("movie_checklist", {})
     if 'popular_movies' not in st.session_state:
@@ -70,17 +102,7 @@ def show_movie_checklist():
     # Sync session state with file on each load
     st.session_state.movie_checklist = creds[current_user].get("movie_checklist", {})
 
-    # Display notifications
-    notifications = creds[current_user].get("notifications", [])
-    if notifications and not st.session_state.notifications_shown:
-        for i, notif in enumerate(notifications):
-            if not notif["read"]:
-                st.toast(f"{notif['message']}", icon="📬")
-                notifications[i]["read"] = True
-                update_user_profile(current_user, notifications=notifications)
-        st.session_state.notifications_shown = True 
-
-    # Top-level tabs
+    # tabs
     tab1, tab2, tab3 = st.tabs(["Discover Movies", "To Watchlist", "History"])
 
     # Discover Movies Tab
@@ -97,7 +119,6 @@ def show_movie_checklist():
             popular_movies = get_popular_movies()
             suggestions = get_keyword_suggestions(search_query, popular_movies + search_results)
             
-            # Pagination controls
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("Previous", disabled=st.session_state.search_page == 1, key="prev_search"):
@@ -223,14 +244,11 @@ def show_movie_checklist():
                     if st.session_state[share_toggle_key]:
                         friends = [u for u in creds.keys() if u != current_user]
                         friend = st.selectbox(f"Share '{movie_info['title']}' with:", friends, key=f"friend_select_unwatch_{movie_id}")
-                        custom_message = st.chat_input("Type a message", key=f"chat_unwatch_{movie_id}")
+                        custom_message = st.chat_input("Send a message", key=f"chat_unwatch_{movie_id}")
                         if custom_message:
                             friend_notifications = creds.get(friend, {}).get("notifications", [])
-                            message_to_send = f"{current_user} shared '{movie_info['title']}' with you: {custom_message}" if custom_message else f"{current_user} shared '{movie_info['title']}' with you!"
-                            friend_notifications.append({
-                                "message": message_to_send,
-                                "read": False
-                            })
+                            message_to_send = f"{current_user} shared '{movie_info['title']}' with you: {custom_message}"
+                            friend_notifications.append({"message": message_to_send, "read": False})
                             update_user_profile(friend, notifications=friend_notifications)
                             st.success(f"Shared '{movie_info['title']}' with {friend}!")
                             st.session_state[share_toggle_key] = False
@@ -241,17 +259,7 @@ def show_movie_checklist():
     # History Tab
     with tab3:
         watched_movies = {k: v for k, v in st.session_state.movie_checklist.items() if v['watched']}
-        emoji_ratings = {
-            9: "😆",  
-            8: "🥰",  
-            7: "😭",    
-            6: "🥱",  
-            5: "🤯",
-            4: "😱",
-            3: "😵‍💫",
-            2: "😡",
-            1: "🤢"   
-        }
+        emoji_ratings = {9: "😆", 8: "🥰", 7: "😭", 6: "🥱", 5: "🤯", 4: "😱", 3: "😵‍💫", 2: "😡", 1: "🤢"}
         if watched_movies:
             for movie_id, movie_info in watched_movies.items():
                 rating_popover_key = f"rating_popover_{movie_id}"
@@ -265,14 +273,10 @@ def show_movie_checklist():
                     if movie_info.get('poster'):
                         st.image(f"{IMAGE_BASE_URL}{movie_info['poster']}", width=50)
                 with col3:
-                    st.write(f"{movie_info['title']} ({movie_info.get('rating', 'N/A')}/10)")
+                    st.write(f"{movie_info['title']}")
                     user_rating = movie_info.get('user_rating', None)
                     if user_rating is not None:
-                        st.pills(
-                            "Your Vibe:",
-                            [emoji_ratings[user_rating]],
-                            key=f"display_rating_{movie_id}"
-                        )
+                        st.pills("Your Vibe:", [emoji_ratings[user_rating]], key=f"display_rating_{movie_id}")
                     else:
                         st.write("Your Vibe: Not rated")              
                 with col4:
@@ -292,41 +296,27 @@ def show_movie_checklist():
                         custom_message = st.chat_input("Type a message", key=f"chat_unwatch_{movie_id}")
                         if custom_message:
                             friend_notifications = creds.get(friend, {}).get("notifications", [])
-                            message_to_send = f"{current_user} shared '{movie_info['title']}' with you: {custom_message}" if custom_message else f"{current_user} shared '{movie_info['title']}' with you!"
-                            friend_notifications.append({
-                                "message": message_to_send,
-                                "read": False
-                            })
+                            message_to_send = f"{current_user} shared '{movie_info['title']}' with you: {custom_message}"
+                            friend_notifications.append({"message": message_to_send, "read": False})
                             update_user_profile(friend, notifications=friend_notifications)
                             st.success(f"Shared '{movie_info['title']}' with {friend}!")
                             st.session_state[share_toggle_key] = False
                             st.rerun()
                 with col5:
                     with st.popover("⭐ Rate"):
-                    #if st.button("⭐ Rate", key=f"rate_{movie_id}"):
-                        #st.session_state[rating_popover_key] = True
-
-                    #if st.session_state[rating_popover_key]:
-                        #with st.popover("Rate this movie"):
-                            rating_options = list(emoji_ratings.values())[::-1]  
-                            rating_key = f"selected_rating_{movie_id}"
-                            if rating_key not in st.session_state:
-                                st.session_state[rating_key] = emoji_ratings.get(user_rating, None)
-                            
-                            selected_emoji = st.pills(
-                                "Select rating:",
-                                rating_options,
-                                key=f"pill_select_{movie_id}"
-                            )
-                            if selected_emoji:
-                                st.session_state[rating_key] = selected_emoji
-                                new_rating = [k for k, v in emoji_ratings.items() if v == selected_emoji][0]
-                                if st.button("Submit", key=f"submit_rating_{movie_id}"):
-                                    st.session_state.movie_checklist[movie_id]['user_rating'] = new_rating
-                                    update_user_profile(st.session_state.username, movie_checklist=st.session_state.movie_checklist)
-                                    st.session_state[rating_popover_key] = False
-                                    st.success(f"Rated '{movie_info['title']}' as {selected_emoji}!")
-                                    st.rerun()
+                        rating_options = list(emoji_ratings.values())[::-1]  
+                        rating_key = f"selected_rating_{movie_id}"
+                        if rating_key not in st.session_state:
+                            st.session_state[rating_key] = emoji_ratings.get(user_rating, None)
+                        selected_emoji = st.pills("Select rating:", rating_options, key=f"pill_select_{movie_id}")
+                        if selected_emoji:
+                            st.session_state[rating_key] = selected_emoji
+                            new_rating = [k for k, v in emoji_ratings.items() if v == selected_emoji][0]
+                            if st.button("Submit", key=f"submit_rating_{movie_id}"):
+                                st.session_state.movie_checklist[movie_id]['user_rating'] = new_rating
+                                update_user_profile(st.session_state.username, movie_checklist=st.session_state.movie_checklist)
+                                st.session_state[rating_popover_key] = False
+                                st.success(f"Rated '{movie_info['title']}' as {selected_emoji}!")
+                                st.rerun()
         else:
             st.write("No movies watched yet!")
-
