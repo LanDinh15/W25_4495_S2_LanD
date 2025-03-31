@@ -197,13 +197,13 @@ if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.username = None
     st.session_state.movie_checklist = {}
-    st.session_state.notifications_shown = False  # Initialize here
+    st.session_state.notifications_shown = False  
 
 # Sidebar
 st.sidebar.title("Movie Trends Dashboard")
 if st.session_state.logged_in:
     st.sidebar.markdown(f"**Logged in as:** {st.session_state.username}")
-    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Global Trends", "Gross Earnings", "Profile"])
+    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Gross Earnings","Global Trends","Profile"])
     if st.sidebar.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = None
@@ -211,7 +211,7 @@ if st.session_state.logged_in:
         st.session_state.notifications_shown = False  # Reset on logout
         st.rerun()
 else:
-    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Gross Earnings"]) 
+    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Gross Earnings", "Global Trends", "Profile"]) 
     st.sidebar.markdown("---")
     with st.sidebar.expander("Authentication", expanded=True):
         auth_option = st.radio("Choose an option", ["Login", "Register"])
@@ -252,6 +252,22 @@ if not st.session_state.logged_in:
         elif page == "Gross Earnings":
             show_gross_earnings()
     else:
+        def set_background_image(image_url):
+            st.markdown(
+                f"""
+                <style>
+                .stApp {{
+                    background-image: url("{image_url}");
+                    background-size: cover;
+                    background-position: center;
+                    background-repeat: no-repeat;
+                    background-blend-mode: overlay;
+                }}
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
+        set_background_image("https://wallpapers.com/images/featured/movie-9pvmdtvz4cb0xl37.jpg")
         st.title("Movie Trends Dashboard")
         st.info("Please log in or register to access this dashboard.")
 elif st.session_state.logged_in:

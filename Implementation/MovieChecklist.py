@@ -255,9 +255,6 @@ def show_movie_checklist():
                             st.success(f"Shared '{movie_info['title']}' with {friend}!")
                             st.session_state[share_toggle_key] = False
                             st.rerun()
-        else:
-            st.write("No movies in your watchlist yet!")
-    
     # History Tab
     with tab3:
         watched_movies = {k: v for k, v in st.session_state.movie_checklist.items() if v['watched']}
@@ -268,7 +265,7 @@ def show_movie_checklist():
                 if rating_popover_key not in st.session_state:
                     st.session_state[rating_popover_key] = False
 
-                col1, col2, col3, col4, col5, col6 = st.columns([1, 1, 4, 1, 1, 2])  
+                col1, col2, col3, col4, col5, col6 = st.columns([1, 1, 3, 0.5, 1, 2])  
                 with col1:
                     st.write(f"Watched: {movie_info.get('watched_date', 'N/A')}")
                 with col2:

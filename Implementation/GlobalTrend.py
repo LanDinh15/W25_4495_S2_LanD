@@ -10,7 +10,6 @@ import warnings
 warnings.filterwarnings('ignore')
 
 def show_global_trends():
-    # Title and Netflix image
     st.title(":round_pushpin: Explore Global Trends")
     st.markdown(
         """
