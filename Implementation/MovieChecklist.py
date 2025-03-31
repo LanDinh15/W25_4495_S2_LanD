@@ -72,7 +72,6 @@ def show_movie_checklist():
         unread_count = sum(1 for notif in notifications if not notif["read"])
         with st.popover(f"🔔 ({unread_count})", help="View your notifications"):
             if notifications:
-                st.markdown("<div class='notification-container'>", unsafe_allow_html=True)
                 for i, notif in enumerate(notifications):
                     style_class = "notification-unread" if not notif["read"] else "notification-read"
                     st.markdown(f"<p class='{style_class}'>{notif['message']}</p>", unsafe_allow_html=True)
@@ -81,7 +80,10 @@ def show_movie_checklist():
                         notifications[i]["read"] = True
                     update_user_profile(current_user, notifications=notifications)
                     st.rerun()
-                st.markdown("</div>", unsafe_allow_html=True)
+                if st.button("Clear All Notifications", key="clear_all_notifications"):
+                    notifications.clear()
+                    update_user_profile(current_user, notifications=notifications)
+                    st.rerun()
             else:
                 st.write("No notifications yet!")
 
@@ -102,7 +104,7 @@ def show_movie_checklist():
     # Sync session state with file on each load
     st.session_state.movie_checklist = creds[current_user].get("movie_checklist", {})
 
-    # tabs
+    # Tabs
     tab1, tab2, tab3 = st.tabs(["Discover Movies", "To Watchlist", "History"])
 
     # Discover Movies Tab
@@ -293,7 +295,7 @@ def show_movie_checklist():
                     if st.session_state[share_toggle_key]:
                         friends = [u for u in creds.keys() if u != current_user]
                         friend = st.selectbox(f"Share '{movie_info['title']}' with:", friends, key=f"friend_select_watch_{movie_id}")
-                        custom_message = st.chat_input("Type a message", key=f"chat_unwatch_{movie_id}")
+                        custom_message = st.chat_input("Send a message", key=f"chat_unwatch_{movie_id}")
                         if custom_message:
                             friend_notifications = creds.get(friend, {}).get("notifications", [])
                             message_to_send = f"{current_user} shared '{movie_info['title']}' with you: {custom_message}"
