@@ -242,11 +242,15 @@ def show_movie_checklist():
     with tab3:
         watched_movies = {k: v for k, v in st.session_state.movie_checklist.items() if v['watched']}
         emoji_ratings = {
-            5: "😊",  
-            4: "🙂",  
-            3: "😐",    
-            2: "😕",  
-            1: "😣"   
+            9: "😆",  
+            8: "🥰",  
+            7: "😭",    
+            6: "🥱",  
+            5: "🤯",
+            4: "😱",
+            3: "😵‍💫",
+            2: "😡",
+            1: "🤢"   
         }
         if watched_movies:
             for movie_id, movie_info in watched_movies.items():
