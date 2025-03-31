@@ -82,7 +82,7 @@ def welcome():
 
 # Main logic
 def show_profile():
-    tab1, tab2 = st.tabs(["My profile", "My Movie Checklist"])
+    tab1, tab2 = st.tabs(["My profile", "My Movielist"])
     with tab1:
         st.title(":dart: My Profile")
         st.markdown(
@@ -91,17 +91,15 @@ def show_profile():
             h1 {
                 font-size: 40px !important;
                 color: #FF2400 !important;
-            }
-            .stForm {
-                color: #FF2400 !important;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
             }
             img {
                 border-radius: 10px;
             }
             button[kind="secondaryFormSubmit"][data-testid="baseButton-secondaryFormSubmit"] {
-                        width: 100%;
-                        text-align: center;
-                    }
+                width: 100%;
+                text-align: center;
+            }
             </style>
             """, unsafe_allow_html=True
         )
