@@ -66,16 +66,16 @@ def welcome():
 
     st.write(f"Today's Date: {datetime.now().strftime('%B %d, %Y')}")
     st.markdown("""
-    Welcome to the **Movie Trends Dashboard**!  
-    Dive into the world of movies—track trending films, analyze box office data, explore genre popularity, and more.  
-    Use the sidebar to log in or register and explore key insights into the film industry.
+    Step into the **Movie Trends Dashboard**—your ultimate hub for movie insights and personal cinematic adventures!  
+    From blockbuster earnings to global Netflix trends, this dashboard lets you explore, track, and share your movie world.  
+    Log in or register via the sidebar to dive into personalized features and data-driven discoveries.
 
-    :star: **Key Features:**
-    - Top trending movies
-    - Genre & rating breakdown
-    - Explore Global Trend
-    - Gross Earnings Explorer
-
+    :star: **What’s Inside:**
+    - **Gross Earnings Explorer**: Unpack box office hits with interactive charts and filters.
+    - **Global Trends**: Map out Netflix content by country, duration, and genre.
+    - **Movie Checklist**: Build your watchlist, rate films, and share with friends using TMDb data.
+    - **Profile Hub**: Customize your experience with avatars and personal stats.
+                
     Enjoy exploring and let the data tell the story! 🍿
     """)
     st.info("👉 Use the sidebar to get started!")
