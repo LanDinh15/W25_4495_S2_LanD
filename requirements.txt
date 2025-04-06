@@ -1,3 +1,5 @@
 streamlit
 pandas
 plotly.express
+streamlit_plotly_events
+datetime
