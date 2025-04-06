@@ -1,9 +1,4 @@
 import streamlit as st #type:ignore
-import pandas as pd #type:ignore
-import numpy as np #type:ignore
-import seaborn as sns #type:ignore
-import matplotlib.pyplot as plt #type:ignore
-import plotly.express as px #type:ignore
 from datetime import datetime, date
 import os
 from GrossEarnings import show_gross_earnings
