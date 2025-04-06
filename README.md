@@ -47,8 +47,7 @@ To run the Movie Trends and Insights Dashboard locally, follow these steps:
     
 ### Step 3: Run the Dashboard
   Start the Streamlit application by running the following command:
-    ```bash
-   streamlit run Welcome.py
+    streamlit run Welcome.py
 
 ## 📋 Usage Notes
 - **Authentication**: Register or log in via the sidebar to access the Profile and Movie Checklist features.
