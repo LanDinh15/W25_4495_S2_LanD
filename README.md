@@ -50,6 +50,11 @@ To run the Movie Trends and Insights Dashboard locally, follow these steps:
     ```bash
    streamlit run Welcome.py
 
+## 📋 Usage Notes
+- **Authentication**: Register or log in via the sidebar to access the Profile and Movie Checklist features.
+- **TMDb API**: The Movie Checklist uses a hardcoded API key (e206cf8b0ba47f28233d0a28ff83c414). For production use, consider securing this key (e.g., via environment variables).
+- **Filters**: Adjust sidebar filters to refine visualizations and explore specific trends.
+
 ## 📞 Contact
 - **Author**: Lan Dinh
 - **Email**: landinh.515@gmail.com
