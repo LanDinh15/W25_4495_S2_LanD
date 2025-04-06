@@ -46,6 +46,7 @@ To run the Movie Trends and Insights Dashboard locally, follow these steps:
     pip install streamlit pandas numpy seaborn matplotlib plotly requests streamlit-plotly-events
 
 ### Step 3: Run the Dashboard
+Start the Streamlit application by running the following command:
     streamlit run Welcome.py
 
 ## 📋 Usage Notes
