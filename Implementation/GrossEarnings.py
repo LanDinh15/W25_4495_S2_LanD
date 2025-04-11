@@ -134,7 +134,7 @@ def show_gross_earnings():
     st.markdown("</div>", unsafe_allow_html=True)
 
     # Main content
-    tab1, tab2, tab3 = st.tabs(["Gross Trends", "Directors & Actors", "Gross Impacter"])
+    tab1, tab2, tab3 = st.tabs(["Gross Trends", "Directors & Actors", "Gross Impactors"])
     with tab1:
         # 1. Gross Earnings Over Time
         st.subheader("Total Gross Earnings (M) Over Time: Peak Performers")
