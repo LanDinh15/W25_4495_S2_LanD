@@ -18,6 +18,9 @@ The **Movie Trends and Insights Dashboard** is a Python-based interactive web ap
   - Bar charts of total duration by country and content type (Movies vs. TV Shows).
   - Interactive choropleth map for title counts by country with genre breakdowns.
   - Filters: release year, content type, rating category, country, and date added.
+- **Success Predictor**:
+  - Predict movie success (Blockbuster, Bust, or Average) using runtime, Meta score, release year, and genre.
+  - Categories based on historical data: Blockbuster (Gross > $100M, IMDb ≥ 8), Bust (Gross < $20M, IMDb < 7), Average (else).
 - **Movie Checklist & Profile**:
   - Personal movie watchlist with search functionality using the TMDb API.
   - Track watched movies, rate them, and share recommendations with friends.
