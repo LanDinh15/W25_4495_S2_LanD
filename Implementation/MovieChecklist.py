@@ -154,7 +154,7 @@ def show_movie_checklist():
                     st.write(f"**Release Date:** {movie.get('release_date', 'N/A')}")
                     st.write(f"**Rating:** {movie.get('vote_average', 'N/A')}/10")
                     st.write(f"**Overview:** {movie.get('overview', 'No description available')}")
-                    if st.button("Add to Checklist", key=f"add_{movie_id}"):
+                    if st.button("Add to Movielist", key=f"add_{movie_id}"):
                         st.session_state.movie_checklist[movie_id] = {
                             'title': movie['title'],
                             'watched': False,
