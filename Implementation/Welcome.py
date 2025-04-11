@@ -267,6 +267,21 @@ if not st.session_state.logged_in:
                 unsafe_allow_html=True
             )
         set_background_image("https://wallpapers.com/images/featured/movie-9pvmdtvz4cb0xl37.jpg")
+        st.markdown(
+        """
+        <style>
+        .sidebar .sidebar-content .css-1d391kg {
+            color: #FF2400 !important;
+        }
+        h1 {
+                font-size: 40px !important;
+                color: #FF2400 !important;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+        )
         st.title("Movie Trends Dashboard")
         st.info("Please log in or register to access this dashboard.")
 elif st.session_state.logged_in:
