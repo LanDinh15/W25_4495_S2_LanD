@@ -3,3 +3,7 @@ pandas
 plotly.express
 streamlit_plotly_events
 datetime
+pickle
+sklearn.model_selection
+sklearn.ensemble
+sklearn.preprocessing
