@@ -1,9 +1,12 @@
 import streamlit as st #type:ignore
 from datetime import datetime, date
 import os
+import pandas as pd #type:ignore
+import pickle
 from GrossEarnings import show_gross_earnings
 from GlobalTrend import show_global_trends 
 from MovieChecklist import show_movie_checklist
+from SucessPredictor import show_success_predictor
 from auth import load_credentials, check_login, register_user, update_user_profile
 
 import warnings
@@ -67,15 +70,16 @@ def welcome():
 
     :star: **What’s Inside:**
     - **Gross Earnings Explorer**: Unpack box office hits with interactive charts and filters.
-    - **Global Trends**: Map out Netflix content by country, duration, and genre.
-    - **Movie Checklist**: Build your watchlist, rate films, and share with friends using TMDb data.
+    - **Global Trends**: Map out movie contents by country, duration, and genre.
+    - **Success Predictor**: Predict if a movie is a Hit, Average, or Flop based on key features.
     - **Profile Hub**: Customize your experience with avatars and personal stats.
+    - **Movie Checklist**: Build your watchlist, rate films, and share movies with your friends.
                 
     Enjoy exploring and let the data tell the story! 🍿
     """)
     st.info("👉 Use the sidebar to get started!")
 
-# Main logic
+# Profile Function
 def show_profile():
     tab1, tab2 = st.tabs(["My profile", "My Movielist"])
     with tab1:
@@ -198,7 +202,7 @@ if "logged_in" not in st.session_state:
 st.sidebar.title("Movie Trends Dashboard")
 if st.session_state.logged_in:
     st.sidebar.markdown(f"**Logged in as:** {st.session_state.username}")
-    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Gross Earnings","Global Trends","Profile"])
+    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Gross Earnings", "Global Trends", "Success Predictor", "Profile"])
     if st.sidebar.button("Logout"):
         st.session_state.logged_in = False
         st.session_state.username = None
@@ -206,7 +210,7 @@ if st.session_state.logged_in:
         st.session_state.notifications_shown = False  # Reset on logout
         st.rerun()
 else:
-    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Gross Earnings", "Global Trends", "Profile"]) 
+    page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Gross Earnings", "Global Trends", "Success Predictor", "Profile"])  
     st.sidebar.markdown("---")
     with st.sidebar.expander("Authentication", expanded=True):
         auth_option = st.radio("Choose an option", ["Login", "Register"])
@@ -219,7 +223,7 @@ else:
                     st.session_state.username = username
                     creds = load_credentials()
                     st.session_state.movie_checklist = creds[username]["movie_checklist"]
-                    st.session_state.notifications_shown = False  # Reset on login
+                    st.session_state.notifications_shown = False  
                     st.success(f"Welcome, {username}!")
                     st.rerun()
                 else:
@@ -274,3 +278,5 @@ elif st.session_state.logged_in:
         show_global_trends()
     elif page == "Profile":
         show_profile()
+    elif page == "Success Predictor":
+        show_success_predictor()
