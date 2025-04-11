@@ -1,7 +1,5 @@
 streamlit
 pandas
-plotly.express
-streamlit_plotly_events
-datetime
-pickle
+plotly
+streamlit-plotly-events
 scikit-learn
