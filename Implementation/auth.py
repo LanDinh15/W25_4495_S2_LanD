@@ -55,13 +55,13 @@ def update_user_profile(username, full_name=None, dob=None, email=None, password
     creds = load_credentials()
     if username not in creds:
         return False
-    if full_name is not None:  
+    if full_name is not None:
         creds[username]["full_name"] = full_name
     if dob is not None:
         creds[username]["dob"] = dob
     if email is not None:
         creds[username]["email"] = email
-    if password is not None:
+    if password: 
         creds[username]["password"] = password
     if avatar_path is not None:
         creds[username]["avatar_path"] = avatar_path

@@ -3,6 +3,7 @@ from datetime import datetime, date
 import os
 import pandas as pd #type:ignore
 import pickle
+import re
 from GrossEarnings import show_gross_earnings
 from GlobalTrend import show_global_trends 
 from MovieChecklist import show_movie_checklist
@@ -171,20 +172,27 @@ def show_profile():
                     if new_password and new_password != confirm_password:
                         st.error("New passwords do not match!")
                     else:
-                        new_avatar_path = user_info.get("avatar_path", None)
-                        if avatar_file is not None:
-                            new_avatar_path = os.path.join(AVATARS_DIR, f"{st.session_state.username}_{avatar_file.name}")
-                            with open(new_avatar_path, "wb") as f:
-                                f.write(avatar_file.getbuffer())
-                        new_dob_str = str(new_dob)
-                        if update_user_profile(st.session_state.username, new_full_name, new_dob_str, new_email, new_password, new_avatar_path):
-                            st.success("Profile updated successfully!")
-                            if new_password: 
-                                st.session_state.logged_in = False
-                                st.session_state.username = None
-                            st.rerun()  
+                        email_pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+                        if new_email and not re.match(email_pattern, new_email):
+                            st.error("Invalid email format!")
                         else:
-                            st.error("Failed to update profile.")
+                            new_avatar_path = user_info.get("avatar_path", None)
+                            if avatar_file is not None:
+                                new_avatar_path = os.path.join(AVATARS_DIR, f"{st.session_state.username}_{avatar_file.name}")
+                                with open(new_avatar_path, "wb") as f:
+                                    f.write(avatar_file.getbuffer())
+                            new_dob_str = str(new_dob)
+                            if update_user_profile(st.session_state.username, new_full_name, new_dob_str, new_email, new_password, new_avatar_path):
+                                st.success("Profile updated successfully!")
+                                if new_password: 
+                                    st.session_state.logged_in = False
+                                    st.session_state.username = None
+                                    st.session_state.movie_checklist = {}
+                                    st.session_state.notifications_shown = False
+                                    st.info("Password changed. Please log in again.")
+                                st.rerun()
+                            else:
+                                st.error("Failed to update profile.")
                 elif close_button:
                     st.session_state.show_update = False
                     st.rerun()
@@ -207,7 +215,7 @@ if st.session_state.logged_in:
         st.session_state.logged_in = False
         st.session_state.username = None
         st.session_state.movie_checklist = {}
-        st.session_state.notifications_shown = False  # Reset on logout
+        st.session_state.notifications_shown = False 
         st.rerun()
 else:
     page = st.sidebar.selectbox("Choose a Dashboard", ["Welcome", "Gross Earnings", "Global Trends", "Success Predictor", "Profile"])  
@@ -236,7 +244,10 @@ else:
             email = st.text_input("Email")
             if st.button("Register"):
                 if new_password == confirm_password:
-                    if register_user(new_username, new_password, full_name, email):
+                    email_pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+                    if email and not re.match(email_pattern, email):
+                        st.error("Invalid email format!")
+                    elif register_user(new_username, new_password, full_name, email):
                         st.success(f"Registration successful! Please log in as {new_username}.")
                     else:
                         st.error("Username already exists!")
