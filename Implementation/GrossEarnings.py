@@ -9,7 +9,6 @@ import warnings
 warnings.filterwarnings('ignore')
 
 def show_gross_earnings():
-    # Title 
     st.title(":popcorn: Gross Earnings Explorer")
     st.markdown(
         """
@@ -63,7 +62,7 @@ def show_gross_earnings():
     genre_content['genre'] = genre_content['genre'].str.strip()
 
 
-    # Add navigation filters for IMDB_Rating and Meta_score
+    # Flters
     st.sidebar.markdown("---")
     st.sidebar.header("Choose your filter: ")
     # Slider for IMDB_Rating
@@ -139,7 +138,6 @@ def show_gross_earnings():
         # 1. Gross Earnings Over Time
         st.subheader("Total Gross Earnings (M) Over Time: Peak Performers")
         gross_trends = filtered_df.groupby('Released_Year')['Gross (M)'].sum().reset_index()
-
         # Check if filtered_df is empty
         if filtered_df.empty:
             st.warning("No data available after applying filters. Please adjust your filter settings.")

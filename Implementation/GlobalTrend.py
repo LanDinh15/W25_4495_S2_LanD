@@ -317,7 +317,6 @@ def show_global_trends():
                 # Split the genre
                 genre_df = country_specific_df.assign(genre=country_specific_df['listed_in'].str.split(',')).explode('genre')
                 genre_df['genre'] = genre_df['genre'].str.strip()
-                # Group by genre and count unique titles
                 genre_counts = genre_df.groupby('genre')['title'].nunique().reset_index(name='count')
                 # Calculate percentages
                 total_titles = genre_counts['count'].sum()
