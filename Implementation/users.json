@@ -1,1 +1,577 @@
-{"admin": {"password": "admin123", "full_name": "User 1", "email": "admin15@example.com", "avatar_path": "avatars/admin_50BE3AEC-4585-4C86-AF39-3BD6605FCAD5.jpg", "dob": "2000-05-15", "movie_checklist": {"1165067": {"title": "Cosmic Chaos", "watched": false, "poster": "/mClzWv7gBqgXfjZXp49Enyoex1v.jpg", "rating": 5.714, "watched_date": null, "user_rating": null}, "1373723": {"title": "The Codes of War", "watched": true, "poster": "/oXeiQAfRK90pxxhP5iKPXQqAIN1.jpg", "rating": 7.9, "watched_date": "Mar 30, 2025", "user_rating": 1}, "1261050": {"title": "The Quiet Ones", "watched": false, "poster": "/7NLY1jNwtZX1yVzwVoBeAhaBE8i.jpg", "rating": 4.5, "watched_date": null, "user_rating": null}, "762509": {"title": "Mufasa: The Lion King", "watched": true, "poster": "/lurEK87kukWNaHd0zYnsi3yzJrs.jpg", "rating": 7.5, "watched_date": "Mar 30, 2025", "user_rating": 5}}, "notifications": [{"message": "lan shared 'Snow White' with you!", "read": true}, {"message": "lan shared 'Moana 2' with you!", "read": true}, {"message": "lan shared 'Captain America: Brave New World' with you: Watch thissss", "read": true}, {"message": "lan shared 'Popeye the Slayer Man' with you: this is so gooood", "read": true}, {"message": "lan shared 'Carjackers' with you: Yo check this movie!", "read": false}]}, "testuser": {"password": "pass123", "full_name": "Test User", "email": "test@example.com", "dob": null, "movie_checklist": {}, "notifications": [{"message": "admin shared 'Cosmic Chaos' with you: Check out 'Cosmic Chaos'!", "read": false}]}, "lan": {"password": "56", "full_name": "Lan", "email": "lan1505@gmail.com", "dob": null, "movie_checklist": {"1229730": {"title": "Carjackers", "watched": false, "poster": "/mtYwRRc7fKt16o0qZJxmBptcdzT.jpg", "rating": 6.656, "watched_date": null, "user_rating": null}, "822119": {"title": "Captain America: Brave New World", "watched": false, "poster": "/pzIddUEMWhWzfvLI3TwxUG2wGoi.jpg", "rating": 6.1, "watched_date": null, "user_rating": null}, "1388366": {"title": "Popeye the Slayer Man", "watched": false, "poster": "/nVwu3mN7hr1yF467pGct3yQFM41.jpg", "rating": 5.9, "watched_date": null, "user_rating": null}, "324544": {"title": "In the Lost Lands", "watched": false, "poster": "/iHf6bXPghWB6gT8kFkL1zo00x6X.jpg", "rating": 5.923, "watched_date": null, "user_rating": null}}, "notifications": [{"message": "admin shared 'Cosmic Chaos' with you: you should watch this", "read": false}]}}
+{
+    "admin": {
+      "password": "admin123",
+      "full_name": "User 1",
+      "email": "admin15@example.com",
+      "avatar_path": "avatars/admin_50BE3AEC-4585-4C86-AF39-3BD6605FCAD5.jpg",
+      "dob": "2000-05-15",
+      "movie_checklist": {
+        "1165067": {
+          "title": "Cosmic Chaos",
+          "watched": false,
+          "poster": "/mClzWv7gBqgXfjZXp49Enyoex1v.jpg",
+          "rating": 5.714,
+          "watched_date": null,
+          "user_rating": null
+        },
+        "1373723": {
+          "title": "The Codes of War",
+          "watched": true,
+          "poster": "/oXeiQAfRK90pxxhP5iKPXQqAIN1.jpg",
+          "rating": 7.9,
+          "watched_date": "Mar 30, 2025",
+          "user_rating": 1
+        },
+        "1261050": {
+          "title": "The Quiet Ones",
+          "watched": false,
+          "poster": "/7NLY1jNwtZX1yVzwVoBeAhaBE8i.jpg",
+          "rating": 4.5,
+          "watched_date": null,
+          "user_rating": null
+        },
+        "762509": {
+          "title": "Mufasa: The Lion King",
+          "watched": true,
+          "poster": "/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
+          "rating": 7.5,
+          "watched_date": "Mar 30, 2025",
+          "user_rating": 5
+        }
+      },
+      "notifications": [
+        {
+          "message": "lan shared 'Snow White' with you!",
+          "read": true
+        },
+        {
+          "message": "lan shared 'Moana 2' with you!",
+          "read": true
+        },
+        {
+          "message": "lan shared 'Captain America: Brave New World' with you: Watch thissss",
+          "read": true
+        },
+        {
+          "message": "lan shared 'Popeye the Slayer Man' with you: this is so gooood",
+          "read": true
+        },
+        {
+          "message": "lan shared 'Carjackers' with you: Yo check this movie!",
+          "read": false
+        },
+        {
+          "message": "kate shared 'In the Lost Lands' with you: Fantasy gem!",
+          "read": false
+        }
+      ]
+    },
+    "testuser": {
+      "password": "pass123",
+      "full_name": "Test User",
+      "email": "test@example.com",
+      "dob": null,
+      "movie_checklist": {},
+      "notifications": [
+        {
+          "message": "admin shared 'Cosmic Chaos' with you: Check out 'Cosmic Chaos'!",
+          "read": false
+        },
+        {
+          "message": "nina shared 'Sky Raiders' with you: Action-packed!",
+          "read": true
+        }
+      ]
+    },
+    "lan": {
+      "password": "56",
+      "full_name": "Lan",
+      "email": "lan1505@gmail.com",
+      "dob": null,
+      "movie_checklist": {
+        "1229730": {
+          "title": "Carjackers",
+          "watched": false,
+          "poster": "/mtYwRRc7fKt16o0qZJxmBptcdzT.jpg",
+          "rating": 6.656,
+          "watched_date": null,
+          "user_rating": null
+        },
+        "822119": {
+          "title": "Captain America: Brave New World",
+          "watched": false,
+          "poster": "/pzIddUEMWhWzfvLI3TwxUG2wGoi.jpg",
+          "rating": 6.1,
+          "watched_date": null,
+          "user_rating": null
+        },
+        "1388366": {
+          "title": "Popeye the Slayer Man",
+          "watched": false,
+          "poster": "/nVwu3mN7hr1yF467pGct3yQFM41.jpg",
+          "rating": 5.9,
+          "watched_date": null,
+          "user_rating": null
+        },
+        "324544": {
+          "title": "In the Lost Lands",
+          "watched": false,
+          "poster": "/iHf6bXPghWB6gT8kFkL1zo00x6X.jpg",
+          "rating": 5.923,
+          "watched_date": null,
+          "user_rating": null
+        }
+      },
+      "notifications": [
+        {
+          "message": "admin shared 'Cosmic Chaos' with you: you should watch this",
+          "read": false
+        },
+        {
+          "message": "zach shared 'Moana 2' with you: Family fun!",
+          "read": true
+        }
+      ]
+    },
+    "kate": {
+      "password": "kate456",
+      "full_name": "Kate Brown",
+      "email": "kate.brown@example.com",
+      "avatar_path": "avatars/kate_1A2B3C4D-5E6F-7A8B-9C0D-1E2F3A4B5C6D.jpg",
+      "dob": "1999-04-12",
+      "movie_checklist": {
+        "1413894": {
+          "title": "Moana 2",
+          "watched": true,
+          "poster": "/fIrzF2KwsFtmR3w1hT2ngBOkU7I.jpg",
+          "rating": 6.8,
+          "watched_date": "Apr 7, 2025",
+          "user_rating": 6
+        },
+        "324544": {
+          "title": "In the Lost Lands",
+          "watched": false,
+          "poster": "/iHf6bXPghWB6gT8kFkL1zo00x6X.jpg",
+          "rating": 5.923,
+          "watched_date": null,
+          "user_rating": null
+        },
+        "1183596": {
+          "title": "Snow White",
+          "watched": true,
+          "poster": "/a1QeYbZgsF1dJDqZ7uX4VOrs2PI.jpg",
+          "rating": 5.5,
+          "watched_date": "Apr 5, 2025",
+          "user_rating": 5
+        }
+      },
+      "notifications": [
+        {
+          "message": "lisa shared 'Carjackers' with you: Awesome thriller!",
+          "read": false
+        },
+        {
+          "message": "admin shared 'The Quiet Ones' with you: Try this!",
+          "read": true
+        }
+      ]
+    },
+    "nina": {
+      "password": "nina789",
+      "full_name": "Nina Patel",
+      "email": "nina.p@douglascollege.ca",
+      "avatar_path": null,
+      "dob": "2001-08-25",
+      "movie_checklist": {
+        "1472589": {
+          "title": "Sky Raiders",
+          "watched": false,
+          "poster": "/xY7zW3mQ9jT8kP5uV6nR7bC2vD1.jpg",
+          "rating": 6.3,
+          "watched_date": null,
+          "user_rating": null
+        },
+        "762509": {
+          "title": "Mufasa: The Lion King",
+          "watched": true,
+          "poster": "/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
+          "rating": 7.5,
+          "watched_date": "Apr 3, 2025",
+          "user_rating": 8
+        }
+      },
+      "notifications": [
+        {
+          "message": "zach shared 'Cosmic Chaos' with you: Sci-fi epic!",
+          "read": false
+        }
+      ]
+    },
+    "zach": {
+      "password": "zach101",
+      "full_name": "Zachary Lee",
+      "email": "zach.lee@example.com",
+      "avatar_path": "avatars/zach_6B7C8D9E-0F1A-2B3C-4D5E-6F7A8B9C0D1E.jpg",
+      "dob": "1997-12-01",
+      "movie_checklist": {
+        "1413894": {
+          "title": "Moana 2",
+          "watched": true,
+          "poster": "/fIrzF2KwsFtmR3w1hT2ngBOkU7I.jpg",
+          "rating": 6.8,
+          "watched_date": "Mar 31, 2025",
+          "user_rating": 7
+        },
+        "1165067": {
+          "title": "Cosmic Chaos",
+          "watched": false,
+          "poster": "/mClzWv7gBqgXfjZXp49Enyoex1v.jpg",
+          "rating": 5.714,
+          "watched_date": null,
+          "user_rating": null
+        }
+      },
+      "notifications": [
+        {
+          "message": "kate shared 'Snow White' with you: Classic remake!",
+          "read": true
+        },
+        {
+          "message": "emma shared 'Data Driven' with you: Check this out!",
+          "read": false
+        }
+      ]
+    },
+    "lisa": {
+      "password": "lisa202",
+      "full_name": "Lisa Nguyen",
+      "email": "lisa.n@douglascollege.ca",
+      "avatar_path": null,
+      "dob": "2003-06-15",
+      "movie_checklist": {
+        "1229730": {
+          "title": "Carjackers",
+          "watched": true,
+          "poster": "/mtYwRRc7fKt16o0qZJxmBptcdzT.jpg",
+          "rating": 6.656,
+          "watched_date": "Apr 6, 2025",
+          "user_rating": 6
+        },
+        "1388366": {
+          "title": "Popeye the Slayer Man",
+          "watched": false,
+          "poster": "/nVwu3mN7hr1yF467pGct3yQFM41.jpg",
+          "rating": 5.9,
+          "watched_date": null,
+          "user_rating": null
+        }
+      },
+      "notifications": [
+        {
+          "message": "nina shared 'Mufasa: The Lion King' with you: So good!",
+          "read": true
+        }
+      ]
+    },
+    "emma": {
+      "password": "emma303",
+      "full_name": "Emma Garcia",
+      "email": "emma.g@example.com",
+      "avatar_path": "avatars/emma_9E0F1A2B-3C4D-5E6F-7A8B-9C0D1E2F3A4B.jpg",
+      "dob": "2000-10-30",
+      "movie_checklist": {
+        "1493612": {
+          "title": "Data Driven",
+          "watched": false,
+          "poster": "/zYqW3kP9jX5fQ3mH7gV9kL2nTfR.jpg",
+          "rating": 6.2,
+          "watched_date": null,
+          "user_rating": null
+        },
+        "822119": {
+          "title": "Captain America: Brave New World",
+          "watched": true,
+          "poster": "/pzIddUEMWhWzfvLI3TwxUG2wGoi.jpg",
+          "rating": 6.1,
+          "watched_date": "Apr 4, 2025",
+          "user_rating": 5
+        }
+      },
+      "notifications": [
+        {
+          "message": "lisa shared 'Carjackers' with you: Must-watch!",
+          "read": false
+        }
+      ]
+    },
+    "tom": {
+      "password": "tom404",
+      "full_name": "Tom Wilson",
+      "email": "tom.w@douglascollege.ca",
+      "avatar_path": null,
+      "dob": "1994-02-28",
+      "movie_checklist": {
+        "1373723": {
+          "title": "The Codes of War",
+          "watched": true,
+          "poster": "/oXeiQAfRK90pxxhP5iKPXQqAIN1.jpg",
+          "rating": 7.9,
+          "watched_date": "Apr 2, 2025",
+          "user_rating": 7
+        }
+      },
+      "notifications": [
+        {
+          "message": "zach shared 'Moana 2' with you: Great animation!",
+          "read": true
+        },
+        {
+          "message": "admin shared 'Mufasa: The Lion King' with you: Epic!",
+          "read": false
+        }
+      ]
+    },
+    "maya": {
+      "password": "maya505",
+      "full_name": "Maya Sharma",
+      "email": "maya.s@example.com",
+      "avatar_path": "avatars/maya_2B3C4D5E-6F7A-8B9C-0D1E-2F3A4B5C6D7E.jpg",
+      "dob": "2005-01-07",
+      "movie_checklist": {
+        "1183596": {
+          "title": "Snow White",
+          "watched": false,
+          "poster": "/a1QeYbZgsF1dJDqZ7uX4VOrs2PI.jpg",
+          "rating": 5.5,
+          "watched_date": null,
+          "user_rating": null
+        },
+        "1504789": {
+          "title": "Night Voyagers",
+          "watched": true,
+          "poster": "/pQ8rW9kX2mV7jL3nK5uY6zF1aB2.jpg",
+          "rating": 5.8,
+          "watched_date": "Apr 8, 2025",
+          "user_rating": 6
+        }
+      },
+      "notifications": [
+        {
+          "message": "tom shared 'The Codes of War' with you: Intense!",
+          "read": false
+        }
+      ]
+    },
+    "ryan": {
+      "password": "ryan606",
+      "full_name": "Ryan Kim",
+      "email": "ryan.k@douglascollege.ca",
+      "avatar_path": null,
+      "dob": null,
+      "movie_checklist": {
+        "1472589": {
+          "title": "Sky Raiders",
+          "watched": false,
+          "poster": "/xY7zW3mQ9jT8kP5uV6nR7bC2vD1.jpg",
+          "rating": 6.3,
+          "watched_date": null,
+          "user_rating": null
+        },
+        "762509": {
+          "title": "Mufasa: The Lion King",
+          "watched": true,
+          "poster": "/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
+          "rating": 7.5,
+          "watched_date": "Apr 5, 2025",
+          "user_rating": 8
+        },
+        "1229730": {
+          "title": "Carjackers",
+          "watched": false,
+          "poster": "/mtYwRRc7fKt16o0qZJxmBptcdzT.jpg",
+          "rating": 6.656,
+          "watched_date": null,
+          "user_rating": null
+        }
+      },
+      "notifications": [
+        {
+          "message": "maya shared 'Night Voyagers' with you: Cool story!",
+          "read": true
+        }
+      ]
+    },
+    "olivia": {
+      "password": "olivia707",
+      "full_name": "Olivia Davis",
+      "email": "olivia.d@example.com",
+      "avatar_path": "avatars/olivia_4D5E6F7A-8B9C-0D1E-2F3A-4B5C6D7E8F9A.jpg",
+      "dob": "1998-03-19",
+      "movie_checklist": {
+        "1413894": {
+          "title": "Moana 2",
+          "watched": true,
+          "poster": "/fIrzF2KwsFtmR3w1hT2ngBOkU7I.jpg",
+          "rating": 6.8,
+          "watched_date": "Apr 6, 2025",
+          "user_rating": 7
+        },
+        "324544": {
+          "title": "In the Lost Lands",
+          "watched": false,
+          "poster": "/iHf6bXPghWB6gT8kFkL1zo00x6X.jpg",
+          "rating": 5.923,
+          "watched_date": null,
+          "user_rating": null
+        }
+      },
+      "notifications": [
+        {
+          "message": "ryan shared 'Mufasa: The Lion King' with you: Amazing!",
+          "read": false
+        },
+        {
+          "message": "lan shared 'Carjackers' with you: Check it out!",
+          "read": true
+        }
+      ]
+    },
+    "jake": {
+      "password": "jake808",
+      "full_name": "Jake Thompson",
+      "email": "jake.t@douglascollege.ca",
+      "avatar_path": null,
+      "dob": "2002-11-11",
+      "movie_checklist": {
+        "1493612": {
+          "title": "Data Driven",
+          "watched": true,
+          "poster": "/zYqW3kP9jX5fQ3mH7gV9kL2nTfR.jpg",
+          "rating": 6.2,
+          "watched_date": "Apr 3, 2025",
+          "user_rating": 6
+        }
+      },
+      "notifications": [
+        {
+          "message": "olivia shared 'Moana 2' with you: Love this one!",
+          "read": true
+        }
+      ]
+    },
+    "sophia": {
+      "password": "sophia909",
+      "full_name": "Sophia Martinez",
+      "email": "sophia.m@example.com",
+      "avatar_path": "avatars/sophia_7E8F9A0B-1C2D-3E4F-5A6B-7C8D9E0F1A2B.jpg",
+      "dob": "1996-07-22",
+      "movie_checklist": {
+        "1183596": {
+          "title": "Snow White",
+          "watched": false,
+          "poster": "/a1QeYbZgsF1dJDqZ7uX4VOrs2PI.jpg",
+          "rating": 5.5,
+          "watched_date": null,
+          "user_rating": null
+        },
+        "1515890": {
+          "title": "Echoes of Time",
+          "watched": true,
+          "poster": "/rT9uV2kX3mW7jL8nK5uY6zF1aB3.jpg",
+          "rating": 5.7,
+          "watched_date": "Apr 7, 2025",
+          "user_rating": 5
+        }
+      },
+      "notifications": [
+        {
+          "message": "jake shared 'Data Driven' with you: Interesting!",
+          "read": false
+        },
+        {
+          "message": "admin shared 'Cosmic Chaos' with you: Sci-fi fan?",
+          "read": true
+        }
+      ]
+    },
+    "ben": {
+      "password": "ben1010",
+      "full_name": "Ben Carter",
+      "email": "ben.c@douglascollege.ca",
+      "avatar_path": null,
+      "dob": "1987-05-03",
+      "movie_checklist": {
+        "1373723": {
+          "title": "The Codes of War",
+          "watched": false,
+          "poster": "/oXeiQAfRK90pxxhP5iKPXQqAIN1.jpg",
+          "rating": 7.9,
+          "watched_date": null,
+          "user_rating": null
+        },
+        "1229730": {
+          "title": "Carjackers",
+          "watched": true,
+          "poster": "/mtYwRRc7fKt16o0qZJxmBptcdzT.jpg",
+          "rating": 6.656,
+          "watched_date": "Apr 4, 2025",
+          "user_rating": 6
+        }
+      },
+      "notifications": [
+        {
+          "message": "sophia shared 'Echoes of Time' with you: Deep plot!",
+          "read": true
+        }
+      ]
+    },
+    "chloe": {
+      "password": "chloe111",
+      "full_name": "Chloe Evans",
+      "email": "chloe.e@example.com",
+      "avatar_path": "avatars/chloe_8F9A0B1C-2D3E-4F5A-6B7C-8D9E0F1A2B3C.jpg",
+      "dob": "2004-09-09",
+      "movie_checklist": {
+        "762509": {
+          "title": "Mufasa: The Lion King",
+          "watched": true,
+          "poster": "/lurEK87kukWNaHd0zYnsi3yzJrs.jpg",
+          "rating": 7.5,
+          "watched_date": "Apr 6, 2025",
+          "user_rating": 9
+        },
+        "1472589": {
+          "title": "Sky Raiders",
+          "watched": false,
+          "poster": "/xY7zW3mQ9jT8kP5uV6nR7bC2vD1.jpg",
+          "rating": 6.3,
+          "watched_date": null,
+          "user_rating": null
+        }
+      },
+      "notifications": [
+        {
+          "message": "ben shared 'Carjackers' with you: Action-packed!",
+          "read": false
+        },
+        {
+          "message": "lan shared 'In the Lost Lands' with you: Try this!",
+          "read": true
+        }
+      ]
+    },
+    "liam": {
+      "password": "liam121",
+      "full_name": "Liam Walker",
+      "email": "liam.w@douglascollege.ca",
+      "avatar_path": null,
+      "dob": null,
+      "movie_checklist": {},
+      "notifications": [
+        {
+          "message": "chloe shared 'Mufasa: The Lion King' with you: Best movie!",
+          "read": true
+        }
+      ]
+    }
+  }
